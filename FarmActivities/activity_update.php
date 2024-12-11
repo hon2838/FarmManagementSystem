@@ -3,7 +3,7 @@ session_start(); // Enable sessions for notifications
 
 // Database connection
 $host = "localhost";
-$username = "r1";
+$username = "root";
 $password = "";
 $database = "farm_management_system";
 

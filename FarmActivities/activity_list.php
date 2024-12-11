@@ -223,7 +223,7 @@ function confirmDeletion(activityId) {
       <?php
       // Database connection
       $host = "localhost";
-      $username = "r1";
+      $username = "root";
       $password = "";
       $database = "farm_management_system";
       
