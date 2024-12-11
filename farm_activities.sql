@@ -42,7 +42,7 @@ CREATE TABLE `farm_activities` (
   `temperature` float NOT NULL,
   `humidity` float NOT NULL,
   `weather_condition` varchar(250) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Indexes for dumped tables
