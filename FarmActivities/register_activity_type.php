@@ -1,4 +1,7 @@
 <?php
+header('Content-Type: application/json');
+error_reporting(0); // Disable error reporting for JSON response
+
 // Database connection
 $host = "localhost";
 $username = "r1";
@@ -7,7 +10,36 @@ $database = "farm_management_system";
 
 $conn = new mysqli($host, $username, $password, $database);
 if ($conn->connect_error) {
-    die(json_encode(['success' => false, 'message' => "Connection failed: " . $conn->connect_error]));
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Handle deletion
+if (isset($_POST['delete_type'])) {
+    $type_id = intval($_POST['type_id']);
+    
+    // Check if type is in use
+    $check_sql = "SELECT COUNT(*) as count FROM farm_activities WHERE activity_type IN (SELECT type_name FROM activity_types WHERE id = ?)";
+    $stmt = $conn->prepare($check_sql);
+    $stmt->bind_param("i", $type_id);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    $count = $result->fetch_assoc()['count'];
+    
+    if ($count > 0) {
+        die("Cannot delete: This activity type is in use");
+    }
+    
+    // Delete the activity type
+    $delete_sql = "DELETE FROM activity_types WHERE id = ?";
+    $stmt = $conn->prepare($delete_sql);
+    $stmt->bind_param("i", $type_id);
+    
+    if ($stmt->execute()) {
+        echo "Activity type deleted successfully";
+    } else {
+        die("Error deleting activity type: " . $conn->error);
+    }
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -16,8 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Validate input
     if (empty($activity_type)) {
-        echo json_encode(['success' => false, 'message' => 'Activity type is required']);
-        exit;
+        die("Activity type is required");
     }
     
     // Check if activity type already exists
@@ -28,8 +59,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $result = $stmt->get_result();
     
     if ($result->num_rows > 0) {
-        echo json_encode(['success' => false, 'message' => 'Activity type already exists']);
-        exit;
+        die("Activity type already exists");
     }
     
     // Insert new activity type
@@ -38,9 +68,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $stmt->bind_param("ss", $activity_type, $description);
     
     if ($stmt->execute()) {
-        echo json_encode(['success' => true]);
+        echo "Activity type added successfully";
     } else {
-        echo json_encode(['success' => false, 'message' => $conn->error]);
+        die("Error adding activity type: " . $conn->error);
     }
 } else {
     echo json_encode(['success' => false, 'message' => 'Invalid request method']);

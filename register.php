@@ -30,19 +30,75 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register - Farm Management System</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+        .navbar {
+            background: rgba(33, 37, 41, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-1px);
+        }
+        .card {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        .btn-success {
+            background-color: #4caf50;
+            border: none;
+            padding: 0.8rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .btn-success:hover {
+            background-color: #388e3c;
+            transform: translateY(-2px);
+        }
+        .back-to-login {
+            color: #4caf50;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        .back-to-login:hover {
+            color: #388e3c;
+        }
+    </style>
 </head>
-<body class="bg-light">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-success">
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
         <div class="container">
-            <a class="navbar-brand" href="#">Green Farm Livestocks</a>
+            <a class="navbar-brand" href="#">
+                <strong>Limau Kasturi</strong>
+            </a>
+            <div class="d-flex">
+                <a href="index.php" class="btn btn-outline-light">Login</a>
+            </div>
         </div>
     </nav>
+
     <div class="container">
-        <div class="row justify-content-center mt-5">
+        <div class="row justify-content-center align-items-center" style="min-height: 80vh;">
             <div class="col-md-4">
                 <div class="card">
-                    <div class="card-body">
-                        <h3 class="card-title text-center mb-4">Register</h3>
+                    <div class="card-body p-4">
+                        <h3 class="card-title text-center mb-4">Create Account</h3>
                         <?php if ($success): ?>
                             <div class="alert alert-success"><?php echo $success; ?></div>
                         <?php endif; ?>
@@ -62,15 +118,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label for="confirm_password" class="form-label">Confirm Password</label>
                                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
                             </div>
-                            <button type="submit" class="btn btn-success w-100">Register</button>
+                            <button type="submit" class="btn btn-success w-100 mb-3">Register</button>
                         </form>
-                        <div class="text-center mt-3">
-                            <a href="index.php" class="text-decoration-none">Already have an account? Login</a>
+                        <div class="text-center">
+                            <a href="index.php" class="back-to-login">Already have an account? Login</a>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

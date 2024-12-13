@@ -1,100 +1,108 @@
+<?php
+session_start();
+
+// Check if user is coming from main dashboard or has active session
+if (isset($_GET['user'])) {
+    $_SESSION['username'] = $_GET['user'];
+} elseif (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+require_once '../header.php'; // Include header from parent directory
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pest Control Management</title>
+    <title>Pest Control Management - Limau Kasturi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
-        /* Global Styles */
         body {
-            font-family: "Lato", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #e8f5e9; /* Light green background */
-            color: #2e7d32;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         }
-
-        /* Header Styling */
-        header {
-            width: 100%;
-            background-color: #66bb6a; /* Green header */
-            color: white;
-            padding: 2rem 0;
-            text-align: center;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.15);
+        .main-content {
+            padding: 4rem 0;
         }
-        header h1 {
+        .welcome-text {
             font-size: 2.5rem;
-            font-weight: bold;
-            margin: 0;
-            text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Main Container */
-        main {
-            margin: 3rem 0;
-            max-width: 900px;
-            width: 90%;
-            background: white;
-            padding: 2.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            text-align: center;
-        }
-        main h2 {
-            color: #2e7d32;
-            font-size: 1.8rem;
-            margin-bottom: 1.5rem;
-            font-weight: bold;
-            letter-spacing: 1px;
-        }
-
-        /* Menu Links */
-        .menu {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        .menu a {
-            text-decoration: none;
-            color: white;
-            background-color: #43a047; /* Button color */
-            padding: 1rem 2.5rem;
-            border-radius: 10px;
-            font-size: 1rem;
             font-weight: 600;
-            letter-spacing: 0.5px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            color: #2e7d32;
+            margin-bottom: 1rem;
         }
-        .menu a:hover {
-            background-color: #388e3c; /* Darker green on hover */
-            transform: translateY(-4px);
-            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 3rem;
         }
-        .menu a:active {
-            transform: translateY(2px);
-            box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Pest Control Management System</h1>
-    </header>
-    <main>
-        <h2>Welcome, Farmer!</h2>
-        <div class="menu">
-            <a href="pesticide_schedule.php">Pesticide Scheduling</a>
-            <a href="stock_management.php">Stock Management</a>
-            <a href="view_stock.php">View Stock Available</a>
-            <a href="/FarmManagementSystem/dashboard.php" class="button">Main Page</a>
+    <div class="main-content">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="welcome-text">Pest Control Management</h1>
+                <p class="subtitle">Monitor and manage pest control activities</p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-success">🗓️</div>
+                        <h3>Pesticide Scheduling</h3>
+                        <p class="text-muted mb-4">Schedule and manage pesticide applications</p>
+                        <a href="pesticide_schedule.php" class="btn btn-success w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-primary">📦</div>
+                        <h3>Stock Management</h3>
+                        <p class="text-muted mb-4">Manage pesticide inventory levels</p>
+                        <a href="stock_management.php" class="btn btn-primary w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-info">📊</div>
+                        <h3>View Stock</h3>
+                        <p class="text-muted mb-4">Monitor available pesticide stock</p>
+                        <a href="view_stock.php" class="btn btn-info w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-secondary">🏠</div>
+                        <h3>Main Dashboard</h3>
+                        <p class="text-muted mb-4">Return to main system dashboard</p>
+                        <a href="/FarmManagementSystem/dashboard.php" class="btn btn-secondary w-100">Back to Main</a>
+                    </div>
+                </div>
+            </div>
         </div>
-    </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
