@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 10, 2024 at 05:09 PM
+-- Generation Time: Dec 13, 2024 at 04:11 PM
 -- Server version: 8.0.38
 -- PHP Version: 8.2.12
 
@@ -32,7 +32,7 @@ CREATE TABLE `customers` (
   `customer_name` varchar(255) NOT NULL,
   `customer_phone` varchar(20) NOT NULL,
   `delivery_address` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `customers`
@@ -40,7 +40,8 @@ CREATE TABLE `customers` (
 
 INSERT INTO `customers` (`customer_id`, `customer_name`, `customer_phone`, `delivery_address`) VALUES
 (1, 'Yeow', '010-11223344', 'Penang 11'),
-(2, 'QI', '012-2344312', 'Jitra 13');
+(2, 'QI', '012-2344312', 'Jitra 13'),
+(3, 'lim', '0121342987', 'Jitra 11');
 
 -- --------------------------------------------------------
 
@@ -54,7 +55,7 @@ CREATE TABLE `expenses` (
   `item_id` int NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `recorded_by` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -104,7 +105,7 @@ CREATE TABLE `inventory` (
   `price_per_kg` decimal(10,2) NOT NULL,
   `total_cost` decimal(10,2) GENERATED ALWAYS AS ((`quantity` * `price_per_kg`)) STORED,
   `recorded_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `inventory`
@@ -112,9 +113,12 @@ CREATE TABLE `inventory` (
 
 INSERT INTO `inventory` (`id`, `grade`, `quantity`, `price_per_kg`, `recorded_date`) VALUES
 (1, 'B', 5, 5.00, '2024-12-10 16:03:34'),
-(2, 'A', 8, 7.00, '2024-12-10 16:05:10'),
+(2, 'A', 4, 7.00, '2024-12-10 16:05:10'),
 (3, 'B', 3, 4.00, '2024-12-10 16:05:34'),
-(4, 'A', 2, 6.00, '2024-12-10 16:05:45');
+(5, 'C', 4, 3.00, '2024-12-10 16:18:15'),
+(6, 'B', 3, 6.00, '2024-12-13 14:55:45'),
+(7, 'C', 3, 3.00, '2024-12-13 15:01:38'),
+(8, 'B', 5, 6.00, '2024-12-13 15:02:38');
 
 -- --------------------------------------------------------
 
@@ -126,7 +130,7 @@ CREATE TABLE `items` (
   `id` int NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `item_name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -142,18 +146,19 @@ CREATE TABLE `orders` (
   `order_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `total_amount` decimal(10,2) DEFAULT NULL,
   `order_status` enum('Pending','Completed') DEFAULT 'Pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
 INSERT INTO `orders` (`order_id`, `customer_id`, `payment_method`, `delivery_status`, `order_date`, `total_amount`, `order_status`) VALUES
-(1, 1, 'cash', 0, '2024-12-10 23:09:38', 22.00, 'Completed'),
 (2, 2, 'online_transfer', 0, '2024-12-10 23:11:03', 16.00, 'Completed'),
 (3, 2, 'cash', 0, '2024-12-10 23:11:17', 10.00, 'Pending'),
-(4, 1, 'cash', 0, '2024-12-11 00:07:29', 8.00, 'Pending'),
-(5, 1, 'cash', 0, '2024-12-11 00:08:10', 24.00, 'Pending');
+(4, 1, 'cash', 0, '2024-12-11 00:07:29', 8.00, 'Completed'),
+(5, 1, 'cash', 0, '2024-12-11 00:08:10', 24.00, 'Pending'),
+(6, 2, 'cash', 0, '2024-12-11 00:12:57', 16.00, 'Pending'),
+(7, 3, 'online_transfer', 0, '2024-12-13 22:32:54', 6.00, 'Pending');
 
 -- --------------------------------------------------------
 
@@ -166,18 +171,19 @@ CREATE TABLE `order_items` (
   `order_id` int NOT NULL,
   `quantity` int NOT NULL,
   `current_price` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `order_items`
 --
 
 INSERT INTO `order_items` (`item_id`, `order_id`, `quantity`, `current_price`) VALUES
-(1, 1, 11, 2.00),
 (2, 2, 4, 4.00),
 (3, 3, 3, 4.00),
 (4, 4, 2, 4.00),
-(5, 5, 3, 8.00);
+(5, 5, 3, 8.00),
+(6, 6, 2, 8.00),
+(7, 7, 2, 3.00);
 
 -- --------------------------------------------------------
 
@@ -194,7 +200,7 @@ CREATE TABLE `pesticide_schedule` (
   `next_application_date` date NOT NULL,
   `notes` text,
   `quantity_used` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `pesticide_schedule`
@@ -203,7 +209,8 @@ CREATE TABLE `pesticide_schedule` (
 INSERT INTO `pesticide_schedule` (`id`, `pesticide_name`, `method`, `application_date`, `reapplication_interval`, `next_application_date`, `notes`, `quantity_used`) VALUES
 (4, 'insecticides', 'chemical', '2024-12-09', 11, '2024-12-20', 'no', 1.00),
 (5, 'insecticides', 'chemical', '2024-12-10', 12, '2024-12-22', '', 2.00),
-(6, 'organic waste', 'biological', '2024-12-10', 12, '2024-12-22', '', 3.00);
+(6, 'organic waste', 'biological', '2024-12-10', 12, '2024-12-22', '', 3.00),
+(7, 'insecticides', 'organic', '2024-12-13', 11, '2024-12-24', '', 2.00);
 
 -- --------------------------------------------------------
 
@@ -219,7 +226,7 @@ CREATE TABLE `profits` (
   `price` decimal(10,2) NOT NULL,
   `delivery_address` text,
   `recorded_by` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -233,14 +240,14 @@ CREATE TABLE `stock_management` (
   `quantity` int NOT NULL,
   `unit` varchar(50) DEFAULT NULL,
   `last_updated` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `stock_management`
 --
 
 INSERT INTO `stock_management` (`id`, `item_name`, `quantity`, `unit`, `last_updated`) VALUES
-(2, 'insecticides', 4, 'Kg', '2024-12-10'),
+(2, 'insecticides', 6, 'Kg', '2024-12-13'),
 (3, 'organic waste', 7, 'kg', '2024-12-10');
 
 -- --------------------------------------------------------
@@ -253,7 +260,7 @@ CREATE TABLE `users` (
   `id` int NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `users`
@@ -275,7 +282,7 @@ CREATE TABLE `weather_data` (
   `temperature` float NOT NULL,
   `humidity` int NOT NULL,
   `condition` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 --
 -- Dumping data for table `weather_data`
@@ -287,7 +294,14 @@ INSERT INTO `weather_data` (`id`, `date`, `temperature`, `humidity`, `condition`
 (3, '2024-12-10', 27.96, 83, 'light rain'),
 (4, '2024-12-10', 27.96, 83, 'light rain'),
 (5, '2024-12-10', 27.95, 83, 'light rain'),
-(6, '2024-12-10', 27.95, 83, 'light rain');
+(6, '2024-12-10', 27.95, 83, 'light rain'),
+(7, '2024-12-11', 26.64, 86, 'overcast clouds'),
+(8, '2024-12-11', 26.64, 86, 'overcast clouds'),
+(9, '2024-12-13', 25.53, 98, 'overcast clouds'),
+(10, '2024-12-13', 25.52, 98, 'overcast clouds'),
+(11, '2024-12-13', 25.52, 98, 'overcast clouds'),
+(12, '2024-12-13', 25.52, 98, 'overcast clouds'),
+(13, '2024-12-13', 25.52, 98, 'overcast clouds');
 
 --
 -- Indexes for dumped tables
@@ -381,7 +395,7 @@ ALTER TABLE `weather_data`
 -- AUTO_INCREMENT for table `customers`
 --
 ALTER TABLE `customers`
-  MODIFY `customer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `customer_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `expenses`
@@ -399,7 +413,7 @@ ALTER TABLE `farm_activities`
 -- AUTO_INCREMENT for table `inventory`
 --
 ALTER TABLE `inventory`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `items`
@@ -411,19 +425,19 @@ ALTER TABLE `items`
 -- AUTO_INCREMENT for table `orders`
 --
 ALTER TABLE `orders`
-  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `order_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `order_items`
 --
 ALTER TABLE `order_items`
-  MODIFY `item_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `item_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `pesticide_schedule`
 --
 ALTER TABLE `pesticide_schedule`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `profits`
@@ -447,7 +461,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `weather_data`
 --
 ALTER TABLE `weather_data`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables

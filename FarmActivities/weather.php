@@ -2,8 +2,13 @@
 // Database connection
 $host = "localhost";
 $username = "r1";
-$password = "1234";
+$password = "";
 $database = "farm_management_system";
+
+$conn = new mysqli($host, $username, $password, $database);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
 
 $conn = new mysqli($host, $username, $password, $database);
 if ($conn->connect_error) {
@@ -39,13 +44,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_weather'])) {
     }
 }
 
+// Handle delete weather data
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_weather'])) {
+    $delete_id = intval($_POST['delete_id']);
+    
+    // Use prepared statement to prevent SQL injection
+    $delete_sql = "DELETE FROM weather_data WHERE id = ?";
+    $stmt = $conn->prepare($delete_sql);
+    $stmt->bind_param("i", $delete_id);
+    
+    if ($stmt->execute()) {
+        $success_message = "Weather record deleted successfully!";
+        // Refresh the page to show updated data
+        header("Location: ".$_SERVER['PHP_SELF']."?week_start=".$week_start);
+        exit();
+    } else {
+        $error_message = "Failed to delete weather record: " . $conn->error;
+    }
+}
+
 // Handle weekly filter
 $week_start = isset($_GET['week_start']) ? $_GET['week_start'] : date("Y-m-d");
 $week_start_date = date('Y-m-d', strtotime($week_start));
 $week_end_date = date('Y-m-d', strtotime($week_start . ' +6 days'));
 
-// Update the weather query to use prepared statement
-$weather_query = "SELECT date, temperature, humidity, `condition` 
+// Update the weather query to include id field
+$weather_query = "SELECT id, date, temperature, humidity, `condition` 
                  FROM weather_data 
                  WHERE date >= ? AND date <= ?
                  ORDER BY date ASC"; // Changed to ASC for chronological order
@@ -259,6 +283,7 @@ if ($debug) {
                 <th>Temperature (°C)</th>
                 <th>Humidity (%)</th>
                 <th>Condition</th>
+                <th>Action</th>
             </tr>
         </thead>
         <tbody>
@@ -270,10 +295,18 @@ if ($debug) {
                     echo "<td>{$row['temperature']}</td>";
                     echo "<td>{$row['humidity']}</td>";
                     echo "<td>{$row['condition']}</td>";
+                    echo "<td>
+                            <form method='POST' style='display: inline;' onsubmit='return confirm(\"Are you sure you want to delete this weather record?\");'>
+                                <input type='hidden' name='delete_id' value='" . $row['id'] . "'>
+                                <button type='submit' name='delete_weather' style='background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;'>
+                                    Delete
+                                </button>
+                            </form>
+                          </td>";
                     echo "</tr>";
                 }
             } else {
-                echo "<tr><td colspan='4'>No weather data available for the selected week.</td></tr>";
+                echo "<tr><td colspan='5'>No weather data available for the selected week.</td></tr>";
             }
             ?>
         </tbody>

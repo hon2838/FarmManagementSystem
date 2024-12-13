@@ -62,6 +62,7 @@
             <a href="weather.php" class="button">Weather</a>
             <a href="schedule_activity.php" class="button">Schedule Activity</a>
             <a href="activity_list.php" class="button">Activity List</a>
+            <a href="weather_prediction.php" class="button">Production Prediction</a>
             <a href="/FarmManagementSystem/dashboard.php" class="button">Main Page</a>
         </div>
     </body>
