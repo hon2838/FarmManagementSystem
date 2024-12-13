@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 13, 2024 at 04:11 PM
+-- Generation Time: Dec 13, 2024 at 04:18 PM
 -- Server version: 8.0.38
 -- PHP Version: 8.2.12
 
@@ -20,6 +20,19 @@ SET time_zone = "+00:00";
 --
 -- Database: `farm_management_system`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `activity_types`
+--
+
+CREATE TABLE `activity_types` (
+  `id` int NOT NULL,
+  `type_name` varchar(100) NOT NULL,
+  `description` text,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
 
@@ -290,22 +303,19 @@ CREATE TABLE `weather_data` (
 
 INSERT INTO `weather_data` (`id`, `date`, `temperature`, `humidity`, `condition`) VALUES
 (1, '2024-12-10', 28.5, 75, 'Sunny'),
-(2, '2024-12-10', 27, 80, 'Cloudy'),
-(3, '2024-12-10', 27.96, 83, 'light rain'),
-(4, '2024-12-10', 27.96, 83, 'light rain'),
-(5, '2024-12-10', 27.95, 83, 'light rain'),
-(6, '2024-12-10', 27.95, 83, 'light rain'),
-(7, '2024-12-11', 26.64, 86, 'overcast clouds'),
 (8, '2024-12-11', 26.64, 86, 'overcast clouds'),
-(9, '2024-12-13', 25.53, 98, 'overcast clouds'),
-(10, '2024-12-13', 25.52, 98, 'overcast clouds'),
-(11, '2024-12-13', 25.52, 98, 'overcast clouds'),
-(12, '2024-12-13', 25.52, 98, 'overcast clouds'),
-(13, '2024-12-13', 25.52, 98, 'overcast clouds');
+(9, '2024-12-13', 25.53, 98, 'overcast clouds');
 
 --
 -- Indexes for dumped tables
 --
+
+--
+-- Indexes for table `activity_types`
+--
+ALTER TABLE `activity_types`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `type_name` (`type_name`);
 
 --
 -- Indexes for table `customers`
@@ -390,6 +400,12 @@ ALTER TABLE `weather_data`
 --
 -- AUTO_INCREMENT for dumped tables
 --
+
+--
+-- AUTO_INCREMENT for table `activity_types`
+--
+ALTER TABLE `activity_types`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `customers`

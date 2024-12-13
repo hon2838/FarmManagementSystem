@@ -95,6 +95,56 @@ form button:hover {
   background-color: #388e3c;
   box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Deeper shadow on hover */
 }
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #4caf50;
+    border-radius: 8px;
+    width: 80%;
+    max-width: 500px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.close {
+    color: #4caf50;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover {
+    color: #388e3c;
+}
+
+.add-type-btn {
+    background-color: #4caf50;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.add-type-btn:hover {
+    background-color: #388e3c;
+}
 </style>
 </head>
 <body>
@@ -106,7 +156,7 @@ form button:hover {
   <?php
   // Database connection
   $host = "localhost";
-  $username = "root";
+  $username = "r1";
   $password = "";
   $database = "farm_management_system";
   
@@ -258,6 +308,9 @@ form button:hover {
           <option value="Planting">Planting</option>
       </select>
 
+      <!-- Add New Activity Type Button -->
+      <button type="button" id="openActivityTypeModal" class="add-type-btn">+ Add New Activity Type</button>
+
       <label for="activity_date">Activity Date</label>
       <input type="date" id="activity_date" name="activity_date" required>
 
@@ -315,5 +368,66 @@ form button:hover {
       <a href="index.php" class="styled-button">Back to Farm Activities System</a>
   </div>
 </div>
+
+<!-- Modal for Registering New Activity Type -->
+<div id="activityTypeModal" class="modal">
+    <div class="modal-content">
+        <span class="close">&times;</span>
+        <h3>Register New Activity Type</h3>
+        <form method="POST" id="activityTypeForm">
+            <label for="new_activity_type">Activity Type:</label>
+            <input type="text" id="new_activity_type" name="new_activity_type" required>
+            <label for="activity_description">Description:</label>
+            <textarea id="activity_description" name="activity_description" rows="3"></textarea>
+            <button type="submit" name="register_activity_type">Register</button>
+        </form>
+    </div>
+</div>
+
+<!-- JavaScript for Modal Functionality -->
+<script>
+var modal = document.getElementById("activityTypeModal");
+var btn = document.getElementById("openActivityTypeModal");
+var span = document.getElementsByClassName("close")[0];
+
+btn.onclick = function() {
+    modal.style.display = "block";
+}
+
+span.onclick = function() {
+    modal.style.display = "none";
+}
+
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+// Handle form submission
+document.getElementById("activityTypeForm").onsubmit = function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    fetch('register_activity_type.php', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Activity type registered successfully!');
+            location.reload();
+        } else {
+            alert('Error registering activity type: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error registering activity type');
+    });
+};
+</script>
+
 </body>
 </html>
