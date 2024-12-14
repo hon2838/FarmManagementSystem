@@ -9,9 +9,7 @@ if (isset($_GET['user'])) {
     exit();
 }
 
-require_once '../db.php';
-
-$error = '';
+require_once '../header.php'; // Include header from parent directory
 
 ?>
 <!DOCTYPE html>
@@ -19,120 +17,114 @@ $error = '';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Limau Kasturi Inventory System</title>
+    <title>Inventory Management - Limau Kasturi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            background-image: url('limau-kasturi-background.jpg'); /* Background Image */
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            color: #333;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         }
-        header {
-            background-color: rgba(40, 167, 69, 0.9); /* Green color with transparency */
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            font-size: 2em;
+        .navbar {
+            background: rgba(33, 37, 41, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        header h1 {
-            margin: 0;
-            font-size: 2.2em;
-            font-weight: bold;
-            text-transform: uppercase;
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
         }
-        .company-name {
-            font-size: 1.2em;
-            font-weight: normal;
-            font-style: italic;
-            margin-top: 5px;
-            color: #fff;
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-1px);
         }
-        .container {
-            text-align: center;
-            padding: 30px 20px;
+        .dropdown-menu {
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .container h2 {
-            font-size: 1.6em;
-            color: #333;
-            margin-bottom: 15px;
+        .dropdown-item {
+            color: rgba(255,255,255,0.85) !important;
+            transition: all 0.3s ease;
         }
-        .container p {
-            font-size: 1em;
-            color: #555;
-            margin-bottom: 20px;
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff !important;
+            transform: translateX(5px);
         }
-        .button {
-            display: inline-block;
-            margin: 10px;
-            padding: 10px 20px; /* Smaller padding */
-            background-color: #28a745;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            font-size: 14px; /* Smaller font */
-            font-weight: bold;
-            transition: background-color 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 200px;
+        .main-content {
+            padding: 4rem 0;
         }
-        .button:hover {
-            background-color: #218838;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 1rem;
         }
-        .button:active {
-            background-color: #1e7e34;
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 3rem;
         }
-        .button-container {
-            display: flex;
-            justify-content: center;
-            flex-direction: column;
-            align-items: center;
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
         }
-        .lime-icon {
-            width: 30px;
-            height: 30px;
-            margin: 5px;
-            object-fit: contain;
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
         }
-        @media (max-width: 768px) {
-            header h1 {
-                font-size: 1.8em;
-            }
-            .company-name {
-                font-size: 1em;
-            }
-            .button {
-                width: 180px;
-                font-size: 12px;
-            }
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Green Farm Livestocks</h1> <!-- Company name at the top -->
-        <p class="company-name">Limau Kasturi Inventory System</p> <!-- Subheading for the system -->
-    </header>
-    <div class="container">
-        <h2>Welcome to the Limau Kasturi Inventory Management System</h2>
-        <p>Select an option below to manage your inventory:</p>
-        
-        <!-- Buttons for inventory actions -->
-        <div class="button-container">
-            <a href="add_inventory.php" class="button">Add Inventory</a>
-            <a href="view_inventory.php" class="button">View Inventory</a>
-            <a href="/FarmManagementSystem/dashboard.php" class="button">Main Page</a>
+    <div class="main-content">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="welcome-text">Inventory Management</h1>
+                <p class="subtitle">Monitor and manage your inventory efficiently</p>
+            </div>
 
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-success">📦</div>
+                        <h3>Add Inventory</h3>
+                        <p class="text-muted mb-4">Add new items to inventory</p>
+                        <a href="add_inventory.php" class="btn btn-success w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-primary">📋</div>
+                        <h3>View Inventory</h3>
+                        <p class="text-muted mb-4">Check current inventory levels</p>
+                        <a href="view_inventory.php" class="btn btn-primary w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-secondary">🏠</div>
+                        <h3>Main Dashboard</h3>
+                        <p class="text-muted mb-4">Return to main system dashboard</p>
+                        <a href="../dashboard.php" class="btn btn-secondary w-100">Back to Main</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
-
-
-

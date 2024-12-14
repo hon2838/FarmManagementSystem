@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Check if user is logged in
 if (!isset($_SESSION['username'])) {
@@ -157,7 +159,7 @@ if (isset($_GET['logout'])) {
                     </a>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" href="../limau_kasturi_orders/index.php">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="../imau_kasturi_orders/customer.php">Register Customer</a></li>
+                        <li><a class="dropdown-item" href="../limau_kasturi_orders/customer.php">Register Customer</a></li>
                         <li><a class="dropdown-item" href="../limau_kasturi_orders/order_create_order.php">Create Order</a></li>
                         <li><a class="dropdown-item" href="../limau_kasturi_orders/orders_update_status.php">Update Status</a></li>
                         <li><a class="dropdown-item" href="../limau_kasturi_orders/completed_orders.php">Completed Orders</a></li>

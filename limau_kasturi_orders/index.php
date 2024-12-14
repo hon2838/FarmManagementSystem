@@ -1,6 +1,14 @@
 <?php
-// Include database connection (optional, depending on usage)
-include '../db.php';
+session_start();
+// Check if user is coming from main dashboard or has active session
+if (isset($_GET['user'])) {
+    $_SESSION['username'] = $_GET['user'];
+} elseif (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+require_once '../header.php'; // Include header from parent directory
 ?>
 
 <!DOCTYPE html>
@@ -8,65 +16,130 @@ include '../db.php';
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Limau Kasturi Order Management</title>
+    <title>Sales Management - Limau Kasturi</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4fdf4; /* Light green background */
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         }
-        .header {
-            background-color: #2e8b57; /* Dark green */
-            color: white;
-            padding: 30px;
-            text-align: center;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        .navbar {
+            background: rgba(33, 37, 41, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        .header h1 {
-            margin: 0;
-            font-size: 2em;
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
         }
-        .menu {
-            margin: 20px auto;
-            max-width: 800px;
-            display: flex;
-            justify-content: space-around;
-            text-align: center;
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-1px);
         }
-        .menu a {
-            padding: 15px 30px;
-            background-color: #f4f4f4; /* Light background */
-            text-decoration: none;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            color: #333;
-            font-size: 1.1em;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s ease, transform 0.2s;
+        .dropdown-menu {
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        .menu a:hover {
-            background-color: #ddd; /* Slight dark shade */
-            transform: scale(1.05);
+        .dropdown-item {
+            color: rgba(255,255,255,0.85) !important;
+            transition: all 0.3s ease;
         }
-        .menu a:active {
-            background-color: #2e8b57; /* Green on click */
-            color: white;
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff !important;
+            transform: translateX(5px);
+        }
+        .main-content {
+            padding: 4rem 0;
+        }
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Limau Kasturi Order Management System</h1>
+    <div class="main-content">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="welcome-text">Sales Management</h1>
+                <p class="subtitle">Monitor and manage sales operations</p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-success">👥</div>
+                        <h3>Register Customer</h3>
+                        <p class="text-muted mb-4">Add new customers to the system</p>
+                        <a href="customer.php" class="btn btn-success w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-primary">📝</div>
+                        <h3>Create Order</h3>
+                        <p class="text-muted mb-4">Create new customer orders</p>
+                        <a href="order_create_order.php" class="btn btn-primary w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-info">🚚</div>
+                        <h3>Update Status</h3>
+                        <p class="text-muted mb-4">Update order delivery status</p>
+                        <a href="orders_update_status.php" class="btn btn-info w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-warning">✓</div>
+                        <h3>Completed Orders</h3>
+                        <p class="text-muted mb-4">View all completed orders</p>
+                        <a href="completed_orders.php" class="btn btn-warning w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-secondary">🏠</div>
+                        <h3>Main Dashboard</h3>
+                        <p class="text-muted mb-4">Return to main system dashboard</p>
+                        <a href="../dashboard.php" class="btn btn-secondary w-100">Back to Main</a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div class="menu">
-        <a href="customer.php">Register Customer</a>
-        <a href="order_create_order.php">Create Order</a>
-        <a href="orders_update_status.php">Update Delivery Status</a>
-        <a href="completed_orders.php" class="menu-button">View Completed Orders</a>
-        <a href="/FarmManagementSystem/dashboard.php" class="button">Main Page</a>
-    </div>
-    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

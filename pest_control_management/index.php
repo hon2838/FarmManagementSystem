@@ -1,6 +1,5 @@
 <?php
 session_start();
-
 // Check if user is coming from main dashboard or has active session
 if (isset($_GET['user'])) {
     $_SESSION['username'] = $_GET['user'];
@@ -126,7 +125,7 @@ require_once '../header.php'; // Include header from parent directory
                         <div class="module-icon text-secondary">🏠</div>
                         <h3>Main Dashboard</h3>
                         <p class="text-muted mb-4">Return to main system dashboard</p>
-                        <a href="/FarmManagementSystem/dashboard.php" class="btn btn-secondary w-100">Back to Main</a>
+                        <a href="../dashboard.php" class="btn btn-secondary w-100">Back to Main</a>
                     </div>
                 </div>
             </div>

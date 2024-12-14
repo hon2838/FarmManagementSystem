@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Check if user is coming from main dashboard or has active session
 if (isset($_GET['user'])) {
@@ -10,6 +12,7 @@ if (isset($_GET['user'])) {
 }
 
 require_once '../db.php';
+require_once '../header.php';
 
 $error = '';
 
@@ -26,15 +29,37 @@ $error = '';
         body {
             min-height: 100vh;
             background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-            font-family: "Lato", sans-serif;
-            margin: 0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            text-align: center;
+        }
+        .main-content {
+            padding: 4rem 0;
+        }
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
             color: #2e7d32;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
         }
         .navbar {
             background: rgba(33, 37, 41, 0.95) !important;
@@ -51,101 +76,76 @@ $error = '';
             color: #fff !important;
             transform: translateY(-1px);
         }
-        .nav-link.active {
-            color: #fff !important;
+        .dropdown-menu {
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .dropdown-item {
+            color: rgba(255,255,255,0.85) !important;
+            transition: all 0.3s ease;
+        }
+        .dropdown-item:hover {
             background: rgba(255,255,255,0.1);
-            border-radius: 5px;
-        }
-        h1 {
-            font-size: 36px;
-            font-weight: bold;
-            color: #2e7d32;
-            margin-bottom: 30px;
-            text-shadow: 1px 1px 4px #a5d6a7;
-        }
-        .button-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            max-width: 300px;
-            width: 100%;
-        }
-        .button {
-            display: inline-block;
-            padding: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #ffffff;
-            background-color: #66bb6a;
-            text-decoration: none;
-            border-radius: 8px;
-            border: 2px solid #43a047;
-            text-align: center;
-            transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            width: 100%;
-        }
-        .button:hover {
-            background-color: #43a047;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-        }
-        .button:active {
-            transform: translateY(1px);
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+            color: #fff !important;
+            transform: translateX(5px);
         }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
+    <div class="main-content">
         <div class="container">
-            <a class="navbar-brand" href="#">
-                <strong>Limau Kasturi</strong>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#">Dashboard</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="FarmActivities/index.php">Farm Activities</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="pest_control_management/index.php">Pest Control</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="InventoryManagementSystem/index.php">Inventory</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="limau_kasturi_orders/index.php">Sales</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="expenses_revenue/dashboard.php">Finance</a>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="bi bi-person-circle"></i> <?php echo htmlspecialchars($_SESSION['username']); ?>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li><a class="dropdown-item" href="?logout">Logout</a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <div class="text-center mb-5">
+                <h1 class="welcome-text">Farm Activities Management</h1>
+                <p class="subtitle">Monitor and manage farming activities</p>
+            </div>
+
+            <div class="row g-4 justify-content-center">
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-info">🌤️</div>
+                        <h3>Weather</h3>
+                        <p class="text-muted mb-4">Check weather conditions</p>
+                        <a href="weather.php" class="btn btn-info w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-success">📋</div>
+                        <h3>Schedule Activity</h3>
+                        <p class="text-muted mb-4">Plan and schedule farm activities</p>
+                        <a href="schedule_activity.php" class="btn btn-success w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-primary">📝</div>
+                        <h3>Activity List</h3>
+                        <p class="text-muted mb-4">View and manage activities</p>
+                        <a href="activity_list.php" class="btn btn-primary w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-warning">📈</div>
+                        <h3>Production Prediction</h3>
+                        <p class="text-muted mb-4">Analyze production forecasts</p>
+                        <a href="weather_prediction.php" class="btn btn-warning w-100">Access</a>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="module-card text-center">
+                        <div class="module-icon text-secondary">🏠</div>
+                        <h3>Main Dashboard</h3>
+                        <p class="text-muted mb-4">Return to main system dashboard</p>
+                        <a href="../dashboard.php" class="btn btn-secondary w-100">Back to Main</a>
+                    </div>
+                </div>
             </div>
         </div>
-    </nav>
-
-    <h1>Farm Activities System</h1>
-    <div class="button-container">
-        <a href="weather.php" class="button">Weather</a>
-        <a href="schedule_activity.php" class="button">Schedule Activity</a>
-        <a href="activity_list.php" class="button">Activity List</a>
-        <a href="weather_prediction.php" class="button">Production Prediction</a>
-        <a href="/FarmManagementSystem/dashboard.php" class="button">Main Page</a>
     </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
