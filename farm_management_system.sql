@@ -32,7 +32,7 @@ CREATE TABLE `activity_types` (
   `type_name` varchar(100) NOT NULL,
   `description` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `activity_types`
@@ -56,7 +56,7 @@ CREATE TABLE `customers` (
   `customer_name` varchar(255) NOT NULL,
   `customer_phone` varchar(20) NOT NULL,
   `delivery_address` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `customers`
@@ -79,7 +79,7 @@ CREATE TABLE `expenses` (
   `item_id` int NOT NULL,
   `price` decimal(10,2) NOT NULL,
   `recorded_by` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 --
 -- Dumping data for table `expenses`
@@ -140,7 +140,7 @@ CREATE TABLE `inventory` (
   `price_per_kg` decimal(10,2) NOT NULL,
   `total_cost` decimal(10,2) GENERATED ALWAYS AS ((`quantity` * `price_per_kg`)) STORED,
   `recorded_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `inventory`
@@ -165,7 +165,7 @@ CREATE TABLE `items` (
   `id` int NOT NULL,
   `item_id` varchar(20) NOT NULL,
   `item_name` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `items`
@@ -188,7 +188,7 @@ CREATE TABLE `orders` (
   `order_date` datetime DEFAULT CURRENT_TIMESTAMP,
   `total_amount` decimal(10,2) DEFAULT NULL,
   `order_status` enum('Pending','Completed') DEFAULT 'Pending'
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `orders`
@@ -213,7 +213,7 @@ CREATE TABLE `order_items` (
   `order_id` int NOT NULL,
   `quantity` int NOT NULL,
   `current_price` decimal(10,2) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `order_items`
@@ -242,7 +242,7 @@ CREATE TABLE `pesticide_schedule` (
   `next_application_date` date NOT NULL,
   `notes` text,
   `quantity_used` decimal(10,2) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `pesticide_schedule`
@@ -268,7 +268,7 @@ CREATE TABLE `profits` (
   `price` decimal(10,2) NOT NULL,
   `delivery_address` text,
   `recorded_by` varchar(50) DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 -- --------------------------------------------------------
 
@@ -283,7 +283,7 @@ CREATE TABLE `stock_history` (
   `quantity` int NOT NULL,
   `unit` varchar(50) NOT NULL,
   `recorded_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 -- --------------------------------------------------------
 
@@ -297,7 +297,7 @@ CREATE TABLE `stock_management` (
   `quantity` int NOT NULL,
   `unit` varchar(50) DEFAULT NULL,
   `last_updated` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `stock_management`
@@ -318,7 +318,7 @@ CREATE TABLE `users` (
   `id` int NOT NULL,
   `username` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `users`
@@ -341,7 +341,7 @@ CREATE TABLE `weather_data` (
   `temperature` float NOT NULL,
   `humidity` int NOT NULL,
   `condition` varchar(255) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 ;
 
 --
 -- Dumping data for table `weather_data`
