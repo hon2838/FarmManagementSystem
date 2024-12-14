@@ -111,6 +111,35 @@ if (isset($_GET['order_id'])) {
         .back-button:hover {
             background-color: #267a4c;
         }
+        .print-button {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .print-button:hover {
+            background-color: #0056b3;
+        }
+        @media print {
+            .print-button, .back-button {
+                display: none;
+            }
+            .invoice-box {
+                box-shadow: none;
+                border: none;
+            }
+            body {
+                background-color: white;
+            }
+        }
     </style>
 </head>
 <body>
@@ -159,6 +188,7 @@ if (isset($_GET['order_id'])) {
             <p>Total Amount: RM <?php echo number_format($order['total_amount'], 2); ?></p>
         </div>
 
+        <button onclick="window.print()" class="print-button">Print Invoice</button>
         <a href="completed_orders.php" class="back-button">Back to Completed Orders</a>
     </div>
 </body>

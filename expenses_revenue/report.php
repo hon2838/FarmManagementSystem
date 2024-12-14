@@ -6,31 +6,52 @@ function formatCurrency($amount) {
     return "RM " . number_format($amount, 2);
 }
 
-
-
-// Update the totals calculation to be year-specific
+// Calculate fiscal metrics for selected year
 $year = isset($_GET['year']) ? intval($_GET['year']) : date('Y');
 
-// Calculate totals for selected year
-$total_profit = $conn->prepare("
+// Calculate total revenue for selected year
+$total_revenue = $conn->prepare("
     SELECT COALESCE(SUM(price), 0) AS total 
     FROM profits 
     WHERE YEAR(record_date) = ?
 ");
-$total_profit->bind_param("i", $year);
-$total_profit->execute();
-$total_profit = $total_profit->get_result()->fetch_assoc()['total'];
+$total_revenue->bind_param("i", $year);
+$total_revenue->execute();
+$total_revenue = $total_revenue->get_result()->fetch_assoc()['total'];
 
-$total_expenses = $conn->prepare("
+// Calculate total expenditure
+$total_expenditure = $conn->prepare("
     SELECT COALESCE(SUM(price), 0) AS total 
     FROM expenses 
     WHERE YEAR(date) = ?
 ");
-$total_expenses->bind_param("i", $year);
-$total_expenses->execute();
-$total_expenses = $total_expenses->get_result()->fetch_assoc()['total'];
+$total_expenditure->bind_param("i", $year);
+$total_expenditure->execute();
+$total_expenditure = $total_expenditure->get_result()->fetch_assoc()['total'];
 
-$revenue_loss = $total_profit - $total_expenses;
+// Calculate net income
+$net_income = $total_revenue - $total_expenditure;
+
+// Calculate monthly financial data
+$monthly_data = $conn->prepare("
+    SELECT 
+        MONTH(record_date) as month,
+        COALESCE(SUM(price), 0) as revenue
+    FROM profits 
+    WHERE YEAR(record_date) = ?
+    GROUP BY MONTH(record_date)
+    ORDER BY month
+");
+
+$monthly_expenses = $conn->prepare("
+    SELECT 
+        MONTH(date) as month,
+        COALESCE(SUM(price), 0) as expenditure
+    FROM expenses 
+    WHERE YEAR(date) = ?
+    GROUP BY MONTH(date)
+    ORDER BY month
+");
 ?>
 
 <!DOCTYPE html>
@@ -38,7 +59,7 @@ $revenue_loss = $total_profit - $total_expenses;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Report - Expenses & Revenue Tracking</title>
+    <title>Financial Report <?php echo $year; ?></title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -57,7 +78,7 @@ $revenue_loss = $total_profit - $total_expenses;
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'profit.php' ? 'active' : ''; ?>" 
-                            href="profit.php">Revenue</a>
+                            href="revenue.php">Revenue</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'report.php' ? 'active' : ''; ?>" 
@@ -69,48 +90,39 @@ $revenue_loss = $total_profit - $total_expenses;
         </nav>
 
     <div class="container mt-4">
-        <!-- Overall Summary Card -->
-        <div class="card mb-4">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Overall Summary for <?php echo $year; ?></h5>
+        <h2>Annual Financial Report <?php echo $year; ?></h2>
+        
+        <div class="summary-cards">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Revenue</h5>
+                    <p class="card-text"><?php echo formatCurrency($total_revenue); ?></p>
+                </div>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="card bg-primary text-white">
-                            <div class="card-body">
-                                <h6 class="card-title">Total Revenue</h6>
-                                <h4><?php echo formatCurrency($total_profit); ?></h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card bg-danger text-white">
-                            <div class="card-body">
-                                <h6 class="card-title">Total Expenses</h6>
-                                <h4><?php echo formatCurrency($total_expenses); ?></h4>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="card <?php echo $revenue_loss >= 0 ? 'bg-success' : 'bg-warning'; ?> text-white">
-                            <div class="card-body">
-                                <h6 class="card-title"><?php echo $revenue_loss >= 0 ? 'Total Revenue' : 'Total Loss'; ?></h6>
-                                <h4><?php echo formatCurrency(abs($revenue_loss)); ?></h4>
-                            </div>
-                        </div>
-                    </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Expenditure</h5>
+                    <p class="card-text"><?php echo formatCurrency($total_expenditure); ?></p>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Net Income</h5>
+                    <p class="card-text <?php echo $net_income >= 0 ? 'text-success' : 'text-danger'; ?>">
+                        <?php echo formatCurrency($net_income); ?>
+                    </p>
                 </div>
             </div>
         </div>
 
+
         <!-- Yearly Summary Card -->
-        <div class="card">
+        <div class="card mt-2">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="card-title mb-0">Monthly Breakdown</h5>
-                <a href="balance_sheet.php?year=<?php echo $year; ?>" 
+                <a href="pnlstmt.php?year=<?php echo $year; ?>" 
                    class="btn btn-primary" target="_blank">
-                    Generate Balance Sheet
+                    Generate Profit and Loss Statement
                 </a>
             </div>
             <div class="card-body">
@@ -191,6 +203,11 @@ $revenue_loss = $total_profit - $total_expenses;
                     </div>
                 <?php } ?>
             </div>
+        </div>
+
+        <div class="chart-container mt-4">
+            <h3>Financial Performance Trends</h3>
+            <canvas id="financialChart"></canvas>
         </div>
     </div>
 

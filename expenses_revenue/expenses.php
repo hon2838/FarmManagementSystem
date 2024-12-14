@@ -131,7 +131,7 @@ $total_expenses = $conn->query("SELECT SUM(price) AS total FROM expenses")->fetc
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'profit.php' ? 'active' : ''; ?>" 
-                            href="profit.php">Profit</a>
+                            href="revenue.php">Revenue</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'report.php' ? 'active' : ''; ?>" 

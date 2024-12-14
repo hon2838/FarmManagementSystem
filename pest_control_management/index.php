@@ -25,6 +25,36 @@ require_once '../header.php'; // Include header from parent directory
             min-height: 100vh;
             background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         }
+        .navbar {
+            background: rgba(33, 37, 41, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-1px);
+        }
+        .dropdown-menu {
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .dropdown-item {
+            color: rgba(255,255,255,0.85) !important;
+            transition: all 0.3s ease;
+        }
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff !important;
+            transform: translateX(5px);
+        }
         .main-content {
             padding: 4rem 0;
         }
