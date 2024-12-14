@@ -81,9 +81,10 @@ $stock = $pdo->query("SELECT * FROM stock_management ORDER BY item_name ASC")->f
 // Fetch stock history
 $stock_history = $pdo->query("
     SELECT 
+        sh.id,
         sm.item_name,
         sh.action,
-        sh.quantity,
+        sh.quantity, 
         sh.unit,
         sh.recorded_date as last_updated
     FROM stock_history sh
@@ -243,6 +244,21 @@ $stock_history = $pdo->query("
             border-radius: 8px;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
+
+        .delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
@@ -306,6 +322,7 @@ $stock_history = $pdo->query("
                 <th>Quantity</th>
                 <th>Unit</th>
                 <th>Date Updated</th>
+                <th>Action</th>
             </tr>
             <?php 
             if (count($stock_history) > 0) {
@@ -317,11 +334,14 @@ $stock_history = $pdo->query("
                     <td><?= htmlspecialchars($record['quantity']) ?></td>
                     <td><?= htmlspecialchars($record['unit']) ?></td>
                     <td><?= date('Y-m-d', strtotime($record['last_updated'])) ?></td>
+                    <td>
+                        <button onclick="deleteRecord(<?= $record['id'] ?>)" class="delete-btn">Delete</button>
+                    </td>
                 </tr>
                 <?php 
                 endforeach;
             } else {
-                echo "<tr><td colspan='5' style='text-align: center;'>No stock records found.</td></tr>";
+                echo "<tr><td colspan='6' style='text-align: center;'>No stock records found.</td></tr>";
             }
             ?>
         </table>
@@ -329,5 +349,28 @@ $stock_history = $pdo->query("
         <a href="index.php" class="back-link">Back to Pest Control Management</a>
         <a href="view_stock.php" class="back-link">View Available Stock</a>
     </main>
+
+    <script>
+    function deleteRecord(id) {
+        if (confirm('Are you sure you want to delete this record?')) {
+            fetch('delete_stock_record.php?id=' + id, {
+                method: 'GET'
+            })
+            .then(response => response.text())
+            .then(message => {
+                if (message.includes('successfully')) {
+                    alert('Record deleted successfully!');
+                    location.reload();
+                } else {
+                    alert('Error: ' + message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting record');
+            });
+        }
+    }
+    </script>
 </body>
 </html>

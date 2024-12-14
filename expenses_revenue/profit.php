@@ -105,135 +105,133 @@ $total_profit = $conn->query("SELECT SUM(price) AS total FROM profits")->fetch_a
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <div class="container">
-                <a class="navbar-brand" href="dashboard.php">E&R Tracking</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'expenses.php' ? 'active' : ''; ?>" 
-                            href="expenses.php">Expenses</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'profit.php' ? 'active' : ''; ?>" 
-                            href="profit.php">Profit</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'report.php' ? 'active' : ''; ?>" 
-                            href="report.php">Report</a>
-                        </li>
-                    </ul>
+    <div class="container">
+        <a class="navbar-brand" href="dashboard.php">E&R Tracking</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'expenses.php' ? 'active' : ''; ?>" 
+                    href="expenses.php">Expenses</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'profit.php' ? 'active' : ''; ?>" 
+                    href="profit.php">Revenue</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'report.php' ? 'active' : ''; ?>" 
+                    href="report.php">Report</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
 
+<div class="container mt-4">
+    <?php if (isset($success)): ?>
+        <div class="alert alert-success"><?php echo $success; ?></div>
+    <?php endif; ?>
+    
+    <?php if (isset($error)): ?>
+        <div class="alert alert-danger"><?php echo $error; ?></div>
+    <?php endif; ?>
+
+    <div class="row">
+        <!-- Record Profit Form -->
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Record Revenue</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="customer_name" class="form-label">Customer Name</label>
+                            <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="record_date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="record_date" name="record_date" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="order_id" class="form-label">Order ID</label>
+                            <input type="text" class="form-control" id="order_id" name="order_id" 
+                                   value="<?php echo htmlspecialchars($next_order_id); ?>" readonly>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <input type="number" step="0.01" class="form-control" id="price" name="price" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="delivery_address" class="form-label">Delivery Address</label>
+                            <textarea class="form-control" id="delivery_address" name="delivery_address" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" name="record_profit" class="btn btn-primary w-100">Save</button>
+                    </form>
                 </div>
             </div>
-        </nav>
+        </div>
 
-    <div class="container mt-4">
-        <?php if (isset($success)): ?>
-            <div class="alert alert-success"><?php echo $success; ?></div>
-        <?php endif; ?>
-        
-        <?php if (isset($error)): ?>
-            <div class="alert alert-danger"><?php echo $error; ?></div>
-        <?php endif; ?>
-
-        <div class="row">
-            <!-- Record Profit Form -->
-            <div class="col-md-4 mb-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Record Profit</h5>
-                    </div>
-                    <div class="card-body">
-                        <form method="POST">
-                            <div class="mb-3">
-                                <label for="customer_name" class="form-label">Customer Name</label>
-                                <input type="text" class="form-control" id="customer_name" name="customer_name" required>
+        <!-- Profit Summary -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Total Revenue Summary</h5>
+                </div>
+                <div class="card-body">
+                    <h3>Total Revenue: <?php echo formatCurrency($total_profit); ?></h3>
+                    
+                    <!-- Monthly Profit -->
+                    <div class="mt-4">
+                        <h5>Monthly Revenue</h5>
+                        <form method="GET" class="row g-3 mb-3">
+                            <div class="col-md-8">
+                                <select name="month" class="form-select">
+                                    <?php
+                                    for ($m = 1; $m <= 12; $m++) {
+                                        $selected = (isset($_GET['month']) && $_GET['month'] == $m) ? 'selected' : '';
+                                        echo "<option value='$m' $selected>" . date('F', mktime(0, 0, 0, $m, 1)) . "</option>";
+                                    }
+                                    ?>
+                                </select>
                             </div>
-                            <div class="mb-3">
-                                <label for="record_date" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="record_date" name="record_date" required>
+                            <div class="col-md-4">
+                                <button type="submit" class="btn btn-primary w-100">Show</button>
                             </div>
-                            <div class="mb-3">
-                                <label for="order_id" class="form-label">Order ID</label>
-                                <input type="text" class="form-control" id="order_id" name="order_id" 
-                                       value="<?php echo htmlspecialchars($next_order_id); ?>" readonly>
-                            </div>
-                            <div class="mb-3">
-                                <label for="price" class="form-label">Price</label>
-                                <input type="number" step="0.01" class="form-control" id="price" name="price" required>
-                            </div>
-                            <div class="mb-3">
-                                <label for="delivery_address" class="form-label">Delivery Address</label>
-                                <textarea class="form-control" id="delivery_address" name="delivery_address" rows="3" required></textarea>
-                            </div>
-                            <button type="submit" name="record_profit" class="btn btn-primary w-100">Save</button>
                         </form>
+                        <?php
+                        if (isset($_GET['month'])) {
+                            $month = $_GET['month'];
+                            $year = date('Y');
+                            $monthly_total = $conn->query("
+                                SELECT SUM(price) as total 
+                                FROM profits 
+                                WHERE MONTH(record_date) = $month 
+                                AND YEAR(record_date) = $year
+                            ")->fetch_assoc()['total'];
+                            
+                            echo "<h6>Total for " . date('F', mktime(0, 0, 0, $month, 1)) . ": " 
+                                 . formatCurrency($monthly_total ?? 0) . "</h6>";
+                        }
+                        ?>
                     </div>
-                </div>
-            </div>
 
-            <!-- Profit Summary -->
-            <div class="col-md-8">
-                <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Total Profit Summary</h5>
-                    </div>
-                    <div class="card-body">
-                        <h3>Total Profit: <?php echo formatCurrency($total_profit); ?></h3>
-                        
-                        <!-- Monthly Profit -->
-                        <div class="mt-4">
-                            <h5>Monthly Profit</h5>
-                            <form method="GET" class="row g-3 mb-3">
+                    <!-- Weekly Profit -->
+                    <div class="mt-4">
+                        <h5>Weekly Revenue</h5>
+                        <form method="GET" class="mb-3">
+                            <div class="row">
                                 <div class="col-md-8">
-                                    <select name="month" class="form-select">
-                                        <?php
-                                        for ($m = 1; $m <= 12; $m++) {
-                                            $selected = (isset($_GET['month']) && $_GET['month'] == $m) ? 'selected' : '';
-                                            echo "<option value='$m' $selected>" . date('F', mktime(0, 0, 0, $m, 1)) . "</option>";
-                                        }
-                                        ?>
-                                    </select>
+                                    <label class="form-label">Start Date</label>
+                                    <input type="date" name="start_date" class="form-control" 
+                                           value="<?php echo $_GET['start_date'] ?? ''; ?>" required>
                                 </div>
                                 <div class="col-md-4">
-                                    <button type="submit" class="btn btn-primary w-100">Show</button>
-                                </div>
-                            </form>
-                            <?php
-                            if (isset($_GET['month'])) {
-                                $month = $_GET['month'];
-                                $year = date('Y');
-                                $monthly_total = $conn->query("
-                                    SELECT SUM(price) as total 
-                                    FROM profits 
-                                    WHERE MONTH(record_date) = $month 
-                                    AND YEAR(record_date) = $year
-                                ")->fetch_assoc()['total'];
-                                
-                                echo "<h6>Total for " . date('F', mktime(0, 0, 0, $month, 1)) . ": " 
-                                     . formatCurrency($monthly_total ?? 0) . "</h6>";
-                            }
-                            ?>
-                        </div>
-
-                        <!-- Weekly Profit -->
-                        <div class="mt-4">
-                            <h5>Weekly Profit</h5>
-                            <form method="GET" class="mb-3">
-                                <div class="row">
-                                    <div class="col-md-8">
-                                        <label class="form-label">Start Date</label>
-                                        <input type="date" name="start_date" class="form-control" 
-                                               value="<?php echo $_GET['start_date'] ?? ''; ?>" required>
-                                    </div>
-                                    <div class="col-md-4">
-                                        <label class="form-label">&nbsp;</label>
-                                        <button type="submit" class="btn btn-primary w-100">Show Week</button>
-                                    </div>
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary w-100">Show Week</button>
                                 </div>
                             </form>
                             <?php
@@ -306,7 +304,7 @@ $total_profit = $conn->query("SELECT SUM(price) AS total FROM profits")->fetch_a
                 <!-- Profit Records Table -->
                 <div class="card">
                     <div class="card-header">
-                        <h5 class="card-title mb-0">Profit Records</h5>
+                        <h5 class="card-title mb-0">Revenue Records</h5>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

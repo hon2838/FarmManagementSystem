@@ -8,7 +8,7 @@ if (isset($_GET['order_id'])) {
     // Fetch order and customer details
     $sql = "SELECT orders.order_id, orders.total_amount, orders.payment_method, orders.order_status,
                    customers.customer_name, customers.customer_phone, customers.delivery_address,
-                   order_items.quantity, order_items.current_price
+                   order_items.quantity, order_items.current_price, orders.order_date
             FROM orders
             JOIN customers ON orders.customer_id = customers.customer_id
             JOIN order_items ON orders.order_id = order_items.order_id
@@ -41,26 +41,60 @@ if (isset($_GET['order_id'])) {
             background-color: #f9f9f9;
         }
         .invoice-box {
-            max-width: 600px;
+            max-width: 800px;
             margin: auto;
             padding: 30px;
             border: 1px solid #ddd;
             background-color: #fff;
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        h2 {
+        .header {
             text-align: center;
-            color: #2e8b57;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #2e8b57;
+            padding-bottom: 20px;
         }
-        .details {
-            margin-bottom: 20px;
-        }
-        .details p {
-            margin: 5px 0;
-        }
-        .total {
+        .company-name {
+            font-size: 24px;
             font-weight: bold;
             color: #2e8b57;
+            margin: 0;
+        }
+        .document-title {
+            font-size: 20px;
+            color: #666;
+            margin: 10px 0;
+        }
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        .customer-details, .order-details {
+            flex: 1;
+        }
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        .items-table th, .items-table td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .items-table th {
+            background-color: #2e8b57;
+            color: white;
+        }
+        .total-amount {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            color: #2e8b57;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
         }
         .back-button {
             display: block;
@@ -81,17 +115,48 @@ if (isset($_GET['order_id'])) {
 </head>
 <body>
     <div class="invoice-box">
-        <h2>Invoice</h2>
-        <p><strong>Order ID:</strong> <?php echo $order['order_id']; ?></p>
-        <p><strong>Customer:</strong> <?php echo $order['customer_name']; ?></p>
-        <p><strong>Phone:</strong> <?php echo $order['customer_phone']; ?></p>
-        <p><strong>Delivery Address:</strong> <?php echo $order['delivery_address']; ?></p>
-        <p><strong>Payment Method:</strong> <?php echo $order['payment_method']; ?></p>
+        <div class="header">
+            <h1 class="company-name">Green Farm Livestocks</h1>
+            <p class="document-title">INVOICE</p>
+            <p>Date: <?php echo date('d/m/Y'); ?></p>
+        </div>
 
-        <div class="details">
-            <p><strong>Quantity (kg):</strong> <?php echo $order['quantity']; ?></p>
-            <p><strong>Price per kg (RM):</strong> <?php echo number_format($order['current_price'], 2); ?></p>
-            <p class="total"><strong>Total Amount (RM):</strong> <?php echo number_format($order['total_amount'], 2); ?></p>
+        <div class="invoice-details">
+            <div class="customer-details">
+                <h3>Bill To:</h3>
+                <p><strong><?php echo $order['customer_name']; ?></strong></p>
+                <p>Phone: <?php echo $order['customer_phone']; ?></p>
+                <p>Address: <?php echo $order['delivery_address']; ?></p>
+            </div>
+            <div class="order-details">
+                <h3>Invoice Details:</h3>
+                <p><strong>Invoice No:</strong> INV-<?php echo $order['order_id']; ?></p>
+                <p><strong>Order Date:</strong> <?php echo date('d/m/Y', strtotime($order['order_date'])); ?></p>
+                <p><strong>Payment Method:</strong> <?php echo ucfirst($order['payment_method']); ?></p>
+            </div>
+        </div>
+
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th>Description</th>
+                    <th>Quantity</th>
+                    <th>Unit Price (RM)</th>
+                    <th>Amount (RM)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Limau Kasturi</td>
+                    <td><?php echo $order['quantity']; ?> kg</td>
+                    <td><?php echo number_format($order['current_price'], 2); ?></td>
+                    <td><?php echo number_format($order['total_amount'], 2); ?></td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="total-amount">
+            <p>Total Amount: RM <?php echo number_format($order['total_amount'], 2); ?></p>
         </div>
 
         <a href="completed_orders.php" class="back-button">Back to Completed Orders</a>

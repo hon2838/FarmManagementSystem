@@ -9,12 +9,74 @@ $year = isset($_GET['year']) ? $_GET['year'] : '';
 // Handle order status updates
 if (isset($_POST['update_status'])) {
     $order_id = $_POST['order_id'];
-    $update_sql = "UPDATE orders SET order_status = 'Completed' WHERE order_id = '$order_id'";
+    
+    // Start transaction
+    $conn->begin_transaction();
+    
+    try {
+        // Update order status
+        $update_sql = "UPDATE orders SET order_status = 'Completed' WHERE order_id = ?";
+        $stmt = $conn->prepare($update_sql);
+        $stmt->bind_param("i", $order_id);
+        $stmt->execute();
 
-    if ($conn->query($update_sql) === TRUE) {
-        echo "<p style='color: green;'>Order status updated successfully.</p>";
-    } else {
-        echo "<p style='color: red;'>Error updating status: " . $conn->error . "</p>";
+        // Get order details for profit record
+        $order_details = $conn->prepare("
+            SELECT o.total_amount, o.order_date, c.customer_name, c.delivery_address 
+            FROM orders o 
+            JOIN customers c ON o.customer_id = c.customer_id 
+            WHERE o.order_id = ?
+        ");
+        $order_details->bind_param("i", $order_id);
+        $order_details->execute();
+        $order = $order_details->get_result()->fetch_assoc();
+
+        // Get next order ID
+        $latest_order = $conn->query("
+            SELECT order_id 
+            FROM profits 
+            WHERE order_id != '' 
+            ORDER BY CAST(SUBSTRING(order_id, 4) AS UNSIGNED) DESC 
+            LIMIT 1
+        ")->fetch_assoc();
+
+        $next_num = '001';
+        if ($latest_order) {
+            $latest_num = intval(substr($latest_order['order_id'], 3));
+            $next_num = sprintf("%03d", $latest_num + 1);
+        }
+        $profit_order_id = 'ORD' . $next_num;
+
+        // Insert into profits table in current database
+        $insert_profit = $conn->prepare("
+            INSERT INTO profits (
+                customer_name, 
+                record_date, 
+                order_id, 
+                price, 
+                delivery_address, 
+                recorded_by
+            ) VALUES (?, ?, ?, ?, ?, ?)
+        ");
+        
+        $recorded_by = $_SESSION['username'] ?? 'system';
+        $insert_profit->bind_param(
+            "sssdss", 
+            $order['customer_name'],
+            $order['order_date'],
+            $profit_order_id,
+            $order['total_amount'],
+            $order['delivery_address'],
+            $recorded_by
+        );
+        $insert_profit->execute();
+
+        $conn->commit();
+        echo "<p style='color: green;'>Order status updated and profit recorded successfully.</p>";
+
+    } catch (Exception $e) {
+        $conn->rollback();
+        echo "<p style='color: red;'>Error updating status: " . $e->getMessage() . "</p>";
     }
 }
 
@@ -67,6 +129,14 @@ if ($month && $year) {
 } elseif ($year) {
     $filter_sql .= " WHERE YEAR(order_date) = '$year'";
 }
+
+// Add ORDER BY clause to show pending orders first, then by date
+$filter_sql .= " ORDER BY 
+                 CASE 
+                    WHEN orders.order_status = 'Pending' THEN 0 
+                    ELSE 1 
+                 END,
+                 orders.order_date DESC";
 
 $result = $conn->query($filter_sql);
 ?>

@@ -57,7 +57,7 @@ $revenue_loss = $total_profit - $total_expenses;
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'profit.php' ? 'active' : ''; ?>" 
-                            href="profit.php">Profit</a>
+                            href="profit.php">Revenue</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'report.php' ? 'active' : ''; ?>" 
@@ -79,7 +79,7 @@ $revenue_loss = $total_profit - $total_expenses;
                     <div class="col-md-4">
                         <div class="card bg-primary text-white">
                             <div class="card-body">
-                                <h6 class="card-title">Total Profit</h6>
+                                <h6 class="card-title">Total Revenue</h6>
                                 <h4><?php echo formatCurrency($total_profit); ?></h4>
                             </div>
                         </div>
@@ -135,7 +135,7 @@ $revenue_loss = $total_profit - $total_expenses;
                     // Get monthly data
                     $monthly_data = array();
                     for ($month = 1; $month <= 12; $month++) {
-                        // Get monthly profit
+                        // Get monthly Revenue
                         $profit_query = $conn->prepare("
                             SELECT COALESCE(SUM(price), 0) AS monthly_profit 
                             FROM profits 
@@ -168,7 +168,7 @@ $revenue_loss = $total_profit - $total_expenses;
                             <thead>
                                 <tr>
                                     <th>Month</th>
-                                    <th>Profit</th>
+                                    <th>Revenue</th>
                                     <th>Expenses</th>
                                     <th>Balance</th>
                                 </tr>
