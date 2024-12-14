@@ -531,6 +531,7 @@ function deleteActivityType(typeId) {
         })
         .then(response => response.text())
         .then(message => {
+            console.log('Server response:', message); // Debug logging
             if (message.includes('successfully')) {
                 alert('Activity type deleted successfully!');
                 location.reload();

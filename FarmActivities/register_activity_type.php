@@ -1,6 +1,7 @@
 <?php
-header('Content-Type: application/json');
-error_reporting(0); // Disable error reporting for JSON response
+// Remove JSON header since we're using text responses
+// header('Content-Type: application/json');
+error_reporting(E_ALL); // Enable error reporting for debugging
 
 // Database connection
 $host = "localhost";
@@ -17,11 +18,19 @@ if ($conn->connect_error) {
 if (isset($_POST['delete_type'])) {
     $type_id = intval($_POST['type_id']);
     
-    // Check if type is in use
-    $check_sql = "SELECT COUNT(*) as count FROM farm_activities WHERE activity_type IN (SELECT type_name FROM activity_types WHERE id = ?)";
+    // Modified query to handle collation mismatch
+    $check_sql = "SELECT COUNT(*) as count 
+                  FROM farm_activities fa 
+                  JOIN activity_types at ON CONVERT(fa.activity_type USING utf8mb4) = CONVERT(at.type_name USING utf8mb4) 
+                  WHERE at.id = ?";
+    
     $stmt = $conn->prepare($check_sql);
     $stmt->bind_param("i", $type_id);
-    $stmt->execute();
+    
+    if (!$stmt->execute()) {
+        die("Error checking activity type usage: " . $conn->error);
+    }
+    
     $result = $stmt->get_result();
     $count = $result->fetch_assoc()['count'];
     
@@ -42,16 +51,16 @@ if (isset($_POST['delete_type'])) {
     exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+// Handle adding new activity type
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['new_activity_type'])) {
     $activity_type = trim($_POST['new_activity_type']);
-    $description = trim($_POST['activity_description']);
+    $description = trim($_POST['activity_description'] ?? '');
     
-    // Validate input
     if (empty($activity_type)) {
         die("Activity type is required");
     }
     
-    // Check if activity type already exists
+    // Check if activity type exists
     $check_sql = "SELECT id FROM activity_types WHERE type_name = ?";
     $stmt = $conn->prepare($check_sql);
     $stmt->bind_param("s", $activity_type);
@@ -72,8 +81,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         die("Error adding activity type: " . $conn->error);
     }
-} else {
-    echo json_encode(['success' => false, 'message' => 'Invalid request method']);
 }
 
 $conn->close();

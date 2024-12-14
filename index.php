@@ -2,21 +2,6 @@
 session_start();
 require_once 'db.php';
 
-// Check if user is coming from main dashboard or has active session
-if (isset($_GET['user'])) {
-    $_SESSION['username'] = $_GET['user'];
-} elseif (!isset($_SESSION['username'])) {
-    header("Location: ../index.php");
-    exit();
-}
-
-// If already logged in, redirect to dashboard
-if (isset($_SESSION['username'])) {
-    header("Location: dashboard.php");
-    exit();
-}
-
-$error = '';
 
 // Handle login form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -37,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-require_once '../header.php'; // Include the header file
 ?>
 <!DOCTYPE html>
 <html lang="en">
