@@ -1,6 +1,6 @@
 <?php
 // Include the database connection
-include 'db_connection.php';
+include '../db.php';
 
 if (isset($_GET['order_id'])) {
     $order_id = $_GET['order_id'];

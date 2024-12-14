@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 // Get the ID of the stock item to edit
 $id = $_GET['id'] ?? null;

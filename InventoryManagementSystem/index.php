@@ -1,3 +1,19 @@
+<?php
+session_start();
+
+// Check if user is coming from main dashboard or has active session
+if (isset($_GET['user'])) {
+    $_SESSION['username'] = $_GET['user'];
+} elseif (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+require_once '../db.php';
+
+$error = '';
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

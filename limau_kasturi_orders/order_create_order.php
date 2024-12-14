@@ -1,6 +1,6 @@
 <?php
 // Include the database connection file
-include 'db_connection.php';
+include '../db.php';
 
 // Initialize a success or error message variable
 $message = "";

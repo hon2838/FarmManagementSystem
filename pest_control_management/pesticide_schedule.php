@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 // Add a new pesticide schedule
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

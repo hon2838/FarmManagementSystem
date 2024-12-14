@@ -1,6 +1,6 @@
 <?php
 // Include the database connection
-include 'db_connection.php';
+include '../db.php';
 
 // Initialize variables for the filter
 $month = isset($_POST['month']) ? $_POST['month'] : null;

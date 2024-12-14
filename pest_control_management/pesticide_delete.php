@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 // Get the ID of the pesticide schedule to delete
 $id = $_GET['id'] ?? null;

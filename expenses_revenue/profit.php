@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'database.php';
+include '../db.php';
 
 // Add this function after database.php include
 function formatCurrency($amount) {

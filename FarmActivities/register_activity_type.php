@@ -3,16 +3,7 @@
 // header('Content-Type: application/json');
 error_reporting(E_ALL); // Enable error reporting for debugging
 
-// Database connection
-$host = "localhost";
-$username = "r1";
-$password = "";
-$database = "farm_management_system";
-
-$conn = new mysqli($host, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include '../db.php';
 
 // Handle deletion
 if (isset($_POST['delete_type'])) {

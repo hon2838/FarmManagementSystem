@@ -9,28 +9,10 @@ if (isset($_GET['user'])) {
     exit();
 }
 
-require_once 'db.php';
+require_once '../db.php';
 
 $error = '';
 
-// Handle login form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-    
-    if (empty($username) || empty($password)) {
-        $error = "Please enter both username and password";
-    } else {
-        // Use the authenticateUser function from db.php
-        if (authenticateUser($username, $password, $pdo)) {
-            $_SESSION['username'] = $username;
-            header("Location: dashboard.php");
-            exit();
-        } else {
-            $error = "Invalid username or password";
-        }
-    }
-}
 ?>
 <!DOCTYPE html>
 <html lang="en">

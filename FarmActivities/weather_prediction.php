@@ -1,14 +1,5 @@
 <?php
-// Database connection
-$host = "localhost";
-$username = "r1";
-$password = "";
-$database = "farm_management_system";
-
-$conn = new mysqli($host, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include '../db.php';
 
 // Get weather data for the current week
 $current_date = date('Y-m-d');

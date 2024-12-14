@@ -146,7 +146,18 @@ table td {
 // Confirmation prompt for deletion
 function confirmDeletion(activityId) {
     if (confirm("Are you sure you want to delete this activity?")) {
-        window.location.href = "activity_delete.php?activity_id=" + activityId;
+        fetch(`activity_delete.php?activity_id=${activityId}`, {
+            method: 'GET'
+        })
+        .then(response => response.text())
+        .then(message => {
+            alert('Activity deleted successfully!');
+            location.reload(); // Refresh the page to update the list
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting activity');
+        });
     }
 }
 </script>
@@ -221,20 +232,16 @@ function confirmDeletion(activityId) {
     </thead>
     <tbody>
       <?php
-      // Database connection
-      $host = "localhost";
-      $username = "root";
-      $password = "";
-      $database = "farm_management_system";
-      
-      $conn = new mysqli($host, $username, $password, $database);
-      if ($conn->connect_error) {
-          die("Connection failed: " . $conn->connect_error);
-      }
+      include '../db.php';
 
       // Fetch data from activities table
-      $sql = "SELECT * FROM farm_activities WHERE 1=1";
-      
+      $sql = "SELECT *, 
+        DATE_FORMAT(activity_date, '%Y-%m-%d') as formatted_date,
+        TIME_FORMAT(start_time, '%H:%i') as formatted_start_time,
+        TIME_FORMAT(end_time, '%H:%i') as formatted_end_time 
+        FROM farm_activities WHERE 1=1";
+
+      // Add filters if present
       if (isset($_GET['year']) && !isset($_GET['month'])) {
           $year = $_GET['year'];
           $sql .= " AND YEAR(activity_date) = '$year'";
@@ -246,15 +253,16 @@ function confirmDeletion(activityId) {
           $sql .= " AND MONTH(activity_date) = '$month' AND YEAR(activity_date) = '$year'";
       }
       
-      $sql .= " ORDER BY activity_date DESC";
+      // Order by date and time, newest first
+      $sql .= " ORDER BY activity_date DESC, start_time DESC";
       $result = $conn->query($sql);
 
       if ($result->num_rows > 0) {
         while ($row = $result->fetch_assoc()) {
           echo "<tr>";
           echo "<td>" . htmlspecialchars($row['activity_type']) . "</td>";
-          echo "<td>" . date('Y-m-d', strtotime($row['activity_date'])) . "</td>";
-          echo "<td>" . htmlspecialchars($row['start_time']) . "</td>";
+          echo "<td>" . $row['formatted_date'] . "</td>";
+          echo "<td>" . $row['formatted_start_time'] . "</td>";
           echo "<td>" . htmlspecialchars($row['end_time']) . "</td>";
           echo "<td>" . htmlspecialchars($row['person_responsible']) . "</td>";
           echo "<td>" . htmlspecialchars($row['plot_field']) . "</td>";
@@ -290,7 +298,18 @@ function confirmDeletion(activityId) {
 <script>
 function confirmDeletion(activityId) {
     if (confirm("Are you sure you want to delete this activity?")) {
-        window.location.href = "activity_delete.php?activity_id=" + activityId;
+        fetch(`activity_delete.php?activity_id=${activityId}`, {
+            method: 'GET'
+        })
+        .then(response => response.text())
+        .then(message => {
+            alert('Activity deleted successfully!');
+            location.reload(); // Refresh the page to update the list
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error deleting activity');
+        });
     }
 }
 </script>

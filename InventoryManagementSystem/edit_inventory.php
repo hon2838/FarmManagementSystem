@@ -1,5 +1,5 @@
 <?php
-include 'db_connection.php';
+include '../db.php';
 
 // Check if ID is provided
 if (isset($_GET['id']) && !empty($_GET['id'])) {

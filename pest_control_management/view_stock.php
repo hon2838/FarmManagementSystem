@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 // Fetch current stock
 $stock = $pdo->query("SELECT * FROM stock_management ORDER BY item_name ASC")->fetchAll(PDO::FETCH_ASSOC);

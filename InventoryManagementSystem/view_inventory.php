@@ -1,5 +1,5 @@
 <?php
-include 'db_connection.php';
+include '../db.php';
 
 // Fetch daily inventory records
 $sql = "SELECT * FROM inventory ORDER BY recorded_date DESC";

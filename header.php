@@ -25,6 +25,10 @@ if (isset($_GET['logout'])) {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <!-- Custom CSS -->
     <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
         .navbar {
             background: rgba(33, 37, 41, 0.95) !important;
             backdrop-filter: blur(10px);
@@ -40,16 +44,54 @@ if (isset($_GET['logout'])) {
             color: #fff !important;
             transform: translateY(-1px);
         }
+        .nav-link.active {
+            color: #fff !important;
+            background: rgba(255,255,255,0.1);
+            border-radius: 5px;
+        }
+        .main-content {
+            padding: 4rem 0;
+        }
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 1rem;
+        }
+        .subtitle {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 3rem;
+        }
+        .module-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+        }
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.1);
+        }
+        .module-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
         .dropdown-menu {
             background: rgba(33, 37, 41, 0.95);
             backdrop-filter: blur(10px);
             border: none;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
+
         .dropdown-item {
             color: rgba(255,255,255,0.85) !important;
             transition: all 0.3s ease;
         }
+
         .dropdown-item:hover {
             background: rgba(255,255,255,0.1);
             color: #fff !important;

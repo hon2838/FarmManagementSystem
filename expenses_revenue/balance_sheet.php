@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'database.php';
+include '../db.php';
 
 function formatCurrency($amount) {
     return "RM " . number_format($amount, 2);

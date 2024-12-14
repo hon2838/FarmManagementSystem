@@ -1,5 +1,5 @@
 <?php
-include 'db.php';
+include '../db.php';
 
 // Get the latest stock item ID
 $latest_item = $pdo->query("
@@ -50,17 +50,47 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['record_stock'])) {
     $item_id = $_POST['item_id'];
     $quantity = $_POST['quantity'];
     
-    $stmt = $pdo->prepare("UPDATE stock_management SET quantity = quantity + ?, last_updated = CURRENT_DATE WHERE id = ?");
+    // Start transaction
+    $pdo->beginTransaction();
     
-    if ($stmt->execute([$quantity, $item_id])) {
+    try {
+        // Update stock quantity
+        $stmt = $pdo->prepare("UPDATE stock_management SET quantity = quantity + ?, last_updated = CURRENT_DATE WHERE id = ?");
+        $stmt->execute([$quantity, $item_id]);
+        
+        // Get unit from stock_management
+        $unit_stmt = $pdo->prepare("SELECT unit FROM stock_management WHERE id = ?");
+        $unit_stmt->execute([$item_id]);
+        $unit = $unit_stmt->fetch(PDO::FETCH_ASSOC)['unit'];
+        
+        // Record in history
+        $stmt = $pdo->prepare("INSERT INTO stock_history (item_id, action, quantity, unit) VALUES (?, 'Added', ?, ?)");
+        $stmt->execute([$item_id, $quantity, $unit]);
+        
+        $pdo->commit();
         $success = "Stock updated successfully!";
-    } else {
-        $error = "Error updating stock";
+    } catch (Exception $e) {
+        $pdo->rollBack();
+        $error = "Error updating stock: " . $e->getMessage();
     }
 }
 
 // Fetch current stock
 $stock = $pdo->query("SELECT * FROM stock_management ORDER BY item_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+
+// Fetch stock history
+$stock_history = $pdo->query("
+    SELECT 
+        sm.item_name,
+        sh.action,
+        sh.quantity,
+        sh.unit,
+        sh.recorded_date as last_updated
+    FROM stock_history sh
+    JOIN stock_management sm ON sh.item_id = sm.id
+    ORDER BY sh.recorded_date DESC, sh.id DESC
+")->fetchAll(PDO::FETCH_ASSOC);
+
 ?>
 
 <!DOCTYPE html>
@@ -152,6 +182,8 @@ $stock = $pdo->query("SELECT * FROM stock_management ORDER BY item_name ASC")->f
             width: 100%;
             border-collapse: collapse;
             margin-top: 2rem;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
         table th, table td {
             border: 1px solid #c3e6cb;
@@ -161,12 +193,16 @@ $stock = $pdo->query("SELECT * FROM stock_management ORDER BY item_name ASC")->f
         table th {
             background-color: #66bb6a; /* Header green */
             color: white;
+            font-weight: bold;
         }
         table tr:nth-child(even) {
             background-color: #f6fff2;
         }
         table tr:nth-child(odd) {
             background-color: #ffffff;
+        }
+        table tr:hover {
+            background-color: #e8f5e9;
         }
         a.back-link {
             display: inline-block;
@@ -262,27 +298,32 @@ $stock = $pdo->query("SELECT * FROM stock_management ORDER BY item_name ASC")->f
         </div>
 
         <!-- Current Stock Table -->
-        <h2>Current Stock</h2>
+        <h2>Stock Record Log</h2>
         <table>
             <tr>
                 <th>Item Name</th>
+                <th>Action</th>
                 <th>Quantity</th>
                 <th>Unit</th>
-                <th>Last Updated</th>
-                <th>Actions</th>
+                <th>Date Updated</th>
             </tr>
-            <?php foreach ($stock as $item): ?>
-            <tr>
-                <td><?= htmlspecialchars($item['item_name']) ?></td>
-                <td><?= htmlspecialchars($item['quantity']) ?></td>
-                <td><?= htmlspecialchars($item['unit']) ?></td>
-                <td><?= htmlspecialchars($item['last_updated']) ?></td>
-                <td>
-                    <a href="stock_edit.php?id=<?= $item['id'] ?>">Edit</a> |
-                    <a href="stock_delete.php?id=<?= $item['id'] ?>" onclick="return confirm('Are you sure you want to delete this stock item?');">Delete</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
+            <?php 
+            if (count($stock_history) > 0) {
+                foreach ($stock_history as $record): 
+                ?>
+                <tr>
+                    <td><?= htmlspecialchars($record['item_name']) ?></td>
+                    <td><?= htmlspecialchars($record['action']) ?></td>
+                    <td><?= htmlspecialchars($record['quantity']) ?></td>
+                    <td><?= htmlspecialchars($record['unit']) ?></td>
+                    <td><?= date('Y-m-d', strtotime($record['last_updated'])) ?></td>
+                </tr>
+                <?php 
+                endforeach;
+            } else {
+                echo "<tr><td colspan='5' style='text-align: center;'>No stock records found.</td></tr>";
+            }
+            ?>
         </table>
         
         <a href="index.php" class="back-link">Back to Pest Control Management</a>

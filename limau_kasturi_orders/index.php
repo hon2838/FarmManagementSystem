@@ -1,6 +1,6 @@
 <?php
 // Include database connection (optional, depending on usage)
-include 'db_connection.php';
+include '../db.php';
 ?>
 
 <!DOCTYPE html>

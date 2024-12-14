@@ -1,14 +1,5 @@
 <?php
-// Database connection and other includes should be at the top
-$host = "localhost";
-$username = "r1";
-$password = "";
-$database = "farm_management_system";
-
-$conn = new mysqli($host, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include '../db.php';
 
 // Weather API settings and data fetching
 $apiKey = "7d280df58afbac062da095d39dcd43c5"; 

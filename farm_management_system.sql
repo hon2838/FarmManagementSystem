@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 13, 2024 at 04:18 PM
+-- Generation Time: Dec 14, 2024 at 04:04 AM
 -- Server version: 8.0.38
 -- PHP Version: 8.2.12
 
@@ -33,6 +33,17 @@ CREATE TABLE `activity_types` (
   `description` text,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `activity_types`
+--
+
+INSERT INTO `activity_types` (`id`, `type_name`, `description`, `created_at`) VALUES
+(2, 'Watering', 'watering for soil moisture', '2024-12-13 15:51:24'),
+(3, 'Fertilizing', '', '2024-12-13 15:55:09'),
+(5, 'Pest Control', '', '2024-12-14 02:36:18'),
+(6, 'Weeding', '', '2024-12-14 02:39:14'),
+(7, 'Planting', '', '2024-12-14 02:42:22');
 
 -- --------------------------------------------------------
 
@@ -70,6 +81,13 @@ CREATE TABLE `expenses` (
   `recorded_by` varchar(50) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+--
+-- Dumping data for table `expenses`
+--
+
+INSERT INTO `expenses` (`id`, `date`, `item_id`, `price`, `recorded_by`) VALUES
+(1, '2024-12-14', 1, 11.00, 'khor');
+
 -- --------------------------------------------------------
 
 --
@@ -101,9 +119,13 @@ CREATE TABLE `farm_activities` (
 --
 
 INSERT INTO `farm_activities` (`activity_id`, `activity_type`, `activity_date`, `start_time`, `end_time`, `person_responsible`, `plot_field`, `specific_area`, `description`, `fertilizer1`, `fertilizer1_amount`, `water1`, `water1_amount`, `other_materials`, `temperature`, `humidity`, `condition`) VALUES
-(1, 'Watering', '2024-12-09 16:00:00', '10:00:00', '00:00:00', 'CY', 'Plot A', 'R1', '', '', 2.00, '', 2.00, '', 27.95, 83, 'overcast clouds'),
-(2, 'Fertilizing', '2024-12-09 16:00:00', '11:12:00', '00:12:00', 'CY', 'Plot A', 'R1', '', '', 4.00, '', 4.00, '', 27.95, 83, 'overcast clouds'),
-(3, 'Fertilizing', '2024-12-08 16:00:00', '00:15:00', '12:17:00', 'CY', 'Plot A', 'R2', 'NO', 'F1', 2.00, 'w1', 1.00, 'hoe', 27.95, 83, 'overcast clouds');
+(3, 'Fertilizing', '2024-12-08 16:00:00', '00:15:00', '12:17:00', 'CY', 'Plot A', 'R2', 'NO', 'F1', 2.00, 'w1', 1.00, 'hoe', 27.95, 83, 'overcast clouds'),
+(4, 'Watering', '2024-12-12 16:00:00', '13:52:00', '14:52:00', 'CY', 'Plot B', 'R1', '', '', 2.00, '', 1.00, 'hoe', 25.52, 97, 'overcast clouds'),
+(5, 'Pest Control', '2024-12-13 16:00:00', '10:36:00', '11:36:00', 'CY', 'Plot A', 'R1', '', '', 2.00, '', 2.00, 'Hoe', 27.98, 79, 'broken clouds'),
+(6, 'Pest Control', '2024-12-13 16:00:00', '10:36:00', '11:36:00', 'CY', 'Plot A', 'R1', '', '', 2.00, '', 2.00, 'Hoe', 27.98, 79, 'broken clouds'),
+(7, 'Pest Control', '2024-12-13 16:00:00', '10:40:00', '11:40:00', 'CY', 'Plot C', 'R3', 'MAINTAIN', 'F1', 2.00, 'w1', 2.00, 'Gloves', 27.98, 79, 'broken clouds'),
+(8, 'Planting', '2024-12-13 16:00:00', '10:42:00', '14:42:00', 'CY', 'Plot B', 'R1', 'PLANT NEW', 'F1', 1.00, 'w1', 1.00, 'Gloves', 27.98, 79, 'broken clouds'),
+(9, 'Fertilizing', '2024-11-13 16:00:00', '10:47:00', '11:47:00', 'yu', 'Plot B', 'R1', '', '', 1.00, '', 1.00, '', 27.98, 79, 'broken clouds');
 
 -- --------------------------------------------------------
 
@@ -144,6 +166,13 @@ CREATE TABLE `items` (
   `item_id` varchar(20) NOT NULL,
   `item_name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `items`
+--
+
+INSERT INTO `items` (`id`, `item_id`, `item_name`) VALUES
+(1, 'ITM001', 'Pesticides');
 
 -- --------------------------------------------------------
 
@@ -244,6 +273,21 @@ CREATE TABLE `profits` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `stock_history`
+--
+
+CREATE TABLE `stock_history` (
+  `id` int NOT NULL,
+  `item_id` int NOT NULL,
+  `action` varchar(50) NOT NULL,
+  `quantity` int NOT NULL,
+  `unit` varchar(50) NOT NULL,
+  `recorded_date` timestamp NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `stock_management`
 --
 
@@ -260,8 +304,9 @@ CREATE TABLE `stock_management` (
 --
 
 INSERT INTO `stock_management` (`id`, `item_name`, `quantity`, `unit`, `last_updated`) VALUES
-(2, 'insecticides', 6, 'Kg', '2024-12-13'),
-(3, 'organic waste', 7, 'kg', '2024-12-10');
+(2, 'insecticides', 10, 'Kg', '2024-12-14'),
+(3, 'organic waste', 9, 'kg', '2024-12-14'),
+(4, 'Pesticides', 3, 'kg', '2024-12-14');
 
 -- --------------------------------------------------------
 
@@ -281,7 +326,8 @@ CREATE TABLE `users` (
 
 INSERT INTO `users` (`id`, `username`, `password`) VALUES
 (2, 'hon', '$2y$10$z2DR5iPebQaJLRQ7Y6tS1.2uvWcwtKOjLswYJI1adY06w0r/39ACC'),
-(3, 'khor', '$2y$10$.IIq6BJXkTOuO2IHKctlW.Wam9AtA3acIjLV2LrOkkl4Y.OrNAwpS');
+(3, 'khor', '$2y$10$.IIq6BJXkTOuO2IHKctlW.Wam9AtA3acIjLV2LrOkkl4Y.OrNAwpS'),
+(4, 'lemon', '$2y$10$jDO1FICFTB2Wre3rHW19zOwMOP3v9hlr2yTtL0BNTNeyCgTrN61UW');
 
 -- --------------------------------------------------------
 
@@ -304,7 +350,9 @@ CREATE TABLE `weather_data` (
 INSERT INTO `weather_data` (`id`, `date`, `temperature`, `humidity`, `condition`) VALUES
 (1, '2024-12-10', 28.5, 75, 'Sunny'),
 (8, '2024-12-11', 26.64, 86, 'overcast clouds'),
-(9, '2024-12-13', 25.53, 98, 'overcast clouds');
+(9, '2024-12-13', 25.53, 98, 'overcast clouds'),
+(15, '2024-12-14', 25.52, 97, 'overcast clouds'),
+(18, '2024-12-14', 27.98, 79, 'broken clouds');
 
 --
 -- Indexes for dumped tables
@@ -378,6 +426,13 @@ ALTER TABLE `profits`
   ADD UNIQUE KEY `order_id` (`order_id`);
 
 --
+-- Indexes for table `stock_history`
+--
+ALTER TABLE `stock_history`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `item_id` (`item_id`);
+
+--
 -- Indexes for table `stock_management`
 --
 ALTER TABLE `stock_management`
@@ -405,7 +460,7 @@ ALTER TABLE `weather_data`
 -- AUTO_INCREMENT for table `activity_types`
 --
 ALTER TABLE `activity_types`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `customers`
@@ -417,13 +472,13 @@ ALTER TABLE `customers`
 -- AUTO_INCREMENT for table `expenses`
 --
 ALTER TABLE `expenses`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `farm_activities`
 --
 ALTER TABLE `farm_activities`
-  MODIFY `activity_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `activity_id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `inventory`
@@ -435,7 +490,7 @@ ALTER TABLE `inventory`
 -- AUTO_INCREMENT for table `items`
 --
 ALTER TABLE `items`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `orders`
@@ -462,22 +517,28 @@ ALTER TABLE `profits`
   MODIFY `id` int NOT NULL AUTO_INCREMENT;
 
 --
+-- AUTO_INCREMENT for table `stock_history`
+--
+ALTER TABLE `stock_history`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `stock_management`
 --
 ALTER TABLE `stock_management`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT for table `weather_data`
 --
 ALTER TABLE `weather_data`
-  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Constraints for dumped tables
@@ -500,6 +561,12 @@ ALTER TABLE `orders`
 --
 ALTER TABLE `order_items`
   ADD CONSTRAINT `order_items_ibfk_1` FOREIGN KEY (`order_id`) REFERENCES `orders` (`order_id`);
+
+--
+-- Constraints for table `stock_history`
+--
+ALTER TABLE `stock_history`
+  ADD CONSTRAINT `stock_history_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `stock_management` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

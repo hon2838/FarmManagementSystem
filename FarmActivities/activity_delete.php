@@ -1,41 +1,24 @@
 <?php
 // Database connection
-$host = "localhost";
-$username = "r1";
-$password = "";
-$database = "farm_management_system";
-
-$conn = new mysqli($host, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$conn = new mysqli($host, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-$conn = new mysqli($host, $username, $password, $database);
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+include '../db.php';
 
 // Check if the activity ID is provided
 if (isset($_GET['activity_id'])) {
     $activity_id = intval($_GET['activity_id']);
 
     // SQL to delete the record
-    $sql = "DELETE FROM farm_activities WHERE activity_id = $activity_id";
+    $sql = "DELETE FROM farm_activities WHERE activity_id = ?";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $activity_id);
 
-    if ($conn->query($sql) === TRUE) {
-        echo "<p>Activity deleted successfully!</p>";
+    if ($stmt->execute()) {
+        echo "success";
     } else {
-        echo "<p>Error deleting record: " . $conn->error . "</p>";
+        echo "Error deleting record: " . $conn->error;
     }
 } else {
-    echo "<p>Invalid request!</p>";
+    echo "Invalid request!";
 }
 
-echo "<a href='activity_list.php'>Back to Activity List</a>";
 $conn->close();
 ?>
