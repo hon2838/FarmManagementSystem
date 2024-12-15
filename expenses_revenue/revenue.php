@@ -2,93 +2,8 @@
 session_start();
 include '../db.php';
 
-// Add this function after database.php include
 function formatCurrency($amount) {
     return "RM " . number_format($amount, 2);
-}
-
-// Get the latest order ID
-$latest_order = $conn->query("
-    SELECT order_id 
-    FROM profits 
-    WHERE order_id != '' 
-    ORDER BY CAST(SUBSTRING(order_id, 4) AS UNSIGNED) DESC 
-    LIMIT 1
-")->fetch_assoc();
-
-$next_order_id = '001';
-if ($latest_order) {
-    // Extract the number from the latest ID and increment it
-    $latest_num = intval(substr($latest_order['order_id'], 3));
-    $next_order_id = sprintf("%03d", $latest_num + 1);
-}
-$next_order_id = 'ORD' . $next_order_id;
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['record_profit'])) {
-        $customer_name = trim($_POST['customer_name']);
-        $record_date = $_POST['record_date'];
-        $order_id = trim($_POST['order_id']);
-        $price = $_POST['price'];
-        $delivery_address = trim($_POST['delivery_address']);
-        $recorded_by = $_SESSION['username'];
-
-        // Validate order_id format
-        if (!preg_match('/^ORD\d{3}$/', $order_id)) {
-            $error = "Invalid order ID format";
-        } else {
-            $stmt = $conn->prepare("INSERT INTO profits (customer_name, record_date, order_id, price, delivery_address, recorded_by) 
-                                  VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssdss", $customer_name, $record_date, $order_id, $price, $delivery_address, $recorded_by);
-
-            if ($stmt->execute()) {
-                $success = "Profit recorded successfully!";
-                
-                // Get the next order ID after successful registration
-                $latest_order = $conn->query("
-                    SELECT order_id 
-                    FROM profits 
-                    WHERE order_id != '' 
-                    ORDER BY CAST(SUBSTRING(order_id, 4) AS UNSIGNED) DESC 
-                    LIMIT 1
-                ")->fetch_assoc();
-                
-                if ($latest_order) {
-                    $latest_num = intval(substr($latest_order['order_id'], 3));
-                    $next_order_id = sprintf("%03d", $latest_num + 1);
-                    $next_order_id = 'ORD' . $next_order_id;
-                }
-                
-                // Add JavaScript to update the form
-                echo "<script>
-                    document.addEventListener('DOMContentLoaded', function() {
-                        document.getElementById('order_id').value = '" . $next_order_id . "';
-                        document.getElementById('customer_name').value = '';
-                        document.getElementById('record_date').value = '';
-                        document.getElementById('price').value = '';
-                        document.getElementById('delivery_address').value = '';
-                    });
-                </script>";
-            } else {
-                $error = "Error recording profit.";
-            }
-            $stmt->close();
-        }
-    }
-
-    // Handle delete
-    if (isset($_POST['delete_profit'])) {
-        $profit_id = $_POST['profit_id'];
-        $stmt = $conn->prepare("DELETE FROM profits WHERE id = ?");
-        $stmt->bind_param("i", $profit_id);
-        
-        if ($stmt->execute()) {
-            $success = "Record deleted successfully!";
-        } else {
-            $error = "Error deleting record.";
-        }
-        $stmt->close();
-    }
 }
 
 // Calculate totals
@@ -140,43 +55,20 @@ $total_profit = $conn->query("SELECT SUM(price) AS total FROM profits")->fetch_a
     <?php endif; ?>
 
     <div class="row">
-        <!-- Record Profit Form -->
-        <div class="col-md-4 mb-4">
+        <!-- Remove this entire section -->
+        <!-- <div class="col-md-4 mb-4">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Record Revenue</h5>
                 </div>
                 <div class="card-body">
-                    <form method="POST">
-                        <div class="mb-3">
-                            <label for="customer_name" class="form-label">Customer Name</label>
-                            <input type="text" class="form-control" id="customer_name" name="customer_name" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="record_date" class="form-label">Date</label>
-                            <input type="date" class="form-control" id="record_date" name="record_date" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="order_id" class="form-label">Order ID</label>
-                            <input type="text" class="form-control" id="order_id" name="order_id" 
-                                   value="<?php echo htmlspecialchars($next_order_id); ?>" readonly>
-                        </div>
-                        <div class="mb-3">
-                            <label for="price" class="form-label">Price</label>
-                            <input type="number" step="0.01" class="form-control" id="price" name="price" required>
-                        </div>
-                        <div class="mb-3">
-                            <label for="delivery_address" class="form-label">Delivery Address</label>
-                            <textarea class="form-control" id="delivery_address" name="delivery_address" rows="3" required></textarea>
-                        </div>
-                        <button type="submit" name="record_profit" class="btn btn-primary w-100">Save</button>
-                    </form>
+                    <form method="POST">...</form>
                 </div>
             </div>
-        </div>
+        </div> -->
 
-        <!-- Profit Summary -->
-        <div class="col-md-8">
+        <!-- Modify the profit summary section to take full width -->
+        <div class="col-md-12">
             <div class="card mb-4">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Total Revenue Summary</h5>
@@ -184,7 +76,7 @@ $total_profit = $conn->query("SELECT SUM(price) AS total FROM profits")->fetch_a
                 <div class="card-body">
                     <h3>Total Revenue: <?php echo formatCurrency($total_profit); ?></h3>
                     
-                    <!-- Monthly Profit -->
+                    <!-- Monthly Revenue section -->
                     <div class="mt-4">
                         <h5>Monthly Revenue</h5>
                         <form method="GET" class="row g-3 mb-3">
@@ -219,7 +111,7 @@ $total_profit = $conn->query("SELECT SUM(price) AS total FROM profits")->fetch_a
                         ?>
                     </div>
 
-                    <!-- Weekly Profit -->
+                    <!-- Weekly Revenue section -->
                     <div class="mt-4">
                         <h5>Weekly Revenue</h5>
                         <form method="GET" class="mb-3">
@@ -299,57 +191,57 @@ $total_profit = $conn->query("SELECT SUM(price) AS total FROM profits")->fetch_a
                             ?>
                         </div>
                     </div>
-                </div>
 
-                <!-- Profit Records Table -->
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="card-title mb-0">Revenue Records</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead>
-                                    <tr>
-                                        <th>Customer Name</th>
-                                        <th>Date</th>
-                                        <th>Order ID</th>
-                                        <th>Price</th>
-                                        <th>Delivery Address</th>
-                                        <th>Recorded By</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php
-                                    $profits = $conn->query("
-                                        SELECT * FROM profits 
-                                        ORDER BY record_date DESC
-                                    ");
-                                    
-                                    while ($profit = $profits->fetch_assoc()):
-                                    ?>
-                                    <tr>
-                                        <td><?php echo htmlspecialchars($profit['customer_name']); ?></td>
-                                        <td><?php echo $profit['record_date']; ?></td>
-                                        <td><?php echo htmlspecialchars($profit['order_id']); ?></td>
-                                        <td><?php echo formatCurrency($profit['price']); ?></td>
-                                        <td><?php echo htmlspecialchars($profit['delivery_address']); ?></td>
-                                        <td><?php echo htmlspecialchars($profit['recorded_by']); ?></td>
-                                        <td>
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="profit_id" value="<?php echo $profit['id']; ?>">
-                                                <button type="submit" name="delete_profit" 
-                                                        class="btn btn-danger btn-sm"
-                                                        onclick="return confirm('Are you sure you want to delete this record?')">
-                                                    Delete
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                    <?php endwhile; ?>
-                                </tbody>
-                            </table>
+                    <!-- Revenue Records Table -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0">Revenue Records</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Customer Name</th>
+                                            <th>Date</th>
+                                            <th>Order ID</th>
+                                            <th>Price</th>
+                                            <th>Delivery Address</th>
+                                            <th>Recorded By</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php
+                                        $profits = $conn->query("
+                                            SELECT * FROM profits 
+                                            ORDER BY record_date DESC
+                                        ");
+                                        
+                                        while ($profit = $profits->fetch_assoc()):
+                                        ?>
+                                        <tr>
+                                            <td><?php echo htmlspecialchars($profit['customer_name']); ?></td>
+                                            <td><?php echo $profit['record_date']; ?></td>
+                                            <td><?php echo htmlspecialchars($profit['order_id']); ?></td>
+                                            <td><?php echo formatCurrency($profit['price']); ?></td>
+                                            <td><?php echo htmlspecialchars($profit['delivery_address']); ?></td>
+                                            <td><?php echo htmlspecialchars($profit['recorded_by']); ?></td>
+                                            <td>
+                                                <form method="POST" class="d-inline">
+                                                    <input type="hidden" name="profit_id" value="<?php echo $profit['id']; ?>">
+                                                    <button type="submit" name="delete_profit" 
+                                                            class="btn btn-danger btn-sm"
+                                                            onclick="return confirm('Are you sure you want to delete this record?')">
+                                                        Delete
+                                                    </button>
+                                                </form>
+                                            </td>
+                                        </tr>
+                                        <?php endwhile; ?>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -358,23 +250,5 @@ $total_profit = $conn->query("SELECT SUM(price) AS total FROM profits")->fetch_a
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Set initial order ID when page loads
-        document.getElementById('order_id').value = '<?php echo $next_order_id; ?>';
-    });
-
-    document.querySelector('form').addEventListener('submit', function(e) {
-        if (this.checkValidity()) {
-            setTimeout(() => {
-                // Clear all fields except order_id after successful submission
-                document.getElementById('customer_name').value = '';
-                document.getElementById('record_date').value = '';
-                document.getElementById('price').value = '';
-                document.getElementById('delivery_address').value = '';
-            }, 100);
-        }
-    });
-    </script>
 </body>
 </html>

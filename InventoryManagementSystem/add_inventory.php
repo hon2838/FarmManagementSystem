@@ -1,5 +1,15 @@
 <?php
-include '../db.php';
+session_start();
+// Check if user is coming from main dashboard or has active session
+if (isset($_GET['user'])) {
+    $_SESSION['username'] = $_GET['user'];
+} elseif (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+require_once '../header.php';
+require_once '../db.php';
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $grade = $_POST['grade'];
@@ -26,254 +36,211 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 }
 
 $conn->close();
-
-// Fetch the external div content
-function fetchExternalDiv() {
-    $url = 'https://manamurah.com/barang/limaukasturi-1928';
-    $ch = curl_init();
-    curl_setopt($ch, CURLOPT_URL, $url);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
-    $html = curl_exec($ch);
-    curl_close($ch);
-
-    $dom = new DOMDocument();
-    libxml_use_internal_errors(true);
-    $dom->loadHTML($html);
-    libxml_clear_errors();
-
-    $xpath = new DOMXPath($dom);
-    $divs = $xpath->query("//div[contains(@class, 'rounded-xl border bg-card text-card-foreground shadow-sm flex-1')]");
-
-    if ($divs->length > 0) {
-        return $dom->saveHTML($divs[0]);
-    } else {
-        return '<p>External content not available.</p>';
-    }
-}
-
-$externalDiv = fetchExternalDiv();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Add Inventory</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Inventory - Inventory Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f8f9fa;
-            color: #333;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
         }
-        h2 {
-            text-align: center;
-            font-size: 1.8em;
-            margin-top: 20px;
+        .navbar {
+            background: rgba(33, 37, 41, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
-        form {
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
         }
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-size: 1em;
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-1px);
         }
-        input, select, button {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            font-size: 1em;
+        .dropdown-menu {
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-        button {
-            background-color: #28a745; /* Green button color */
-            color: white;
-            font-weight: bold;
-            cursor: pointer;
+        .dropdown-item {
+            color: rgba(255,255,255,0.85) !important;
+            transition: all 0.3s ease;
         }
-        button:hover {
-            background-color: #218838; /* Darker green on hover */
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff !important;
+            transform: translateX(5px);
         }
-        .view-button {
-            display: inline-block;
-            width: auto;
-            text-align: center;
-            background-color: #28a745; /* Green button color */
-            color: white;
-            text-decoration: none;
-            padding: 8px 20px; /* Smaller button size */
-            border-radius: 5px;
-            font-weight: bold;
-            margin-top: 15px;
+        .main-content {
+            padding: 4rem 0;
         }
-        .view-button:hover {
-            background-color: #218838; /* Darker green on hover */
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2e7d32;
+            margin-bottom: 1rem;
         }
-        /* Add these new styles */
         .content-container {
             display: flex;
-            flex-direction: row-reverse; /* Reverses the order of flex items */
             justify-content: space-between;
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
             gap: 30px;
         }
-
         .form-section {
             flex: 1;
             background: white;
             padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
         }
-
-        .external-content {
-            flex: 1;
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        form label {
+            color: #2e7d32;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
-
-        .external-content h2 {
-            color: #28a745;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            text-align: center;
+        form input, form select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            background-color: #f9f9f9;
         }
-
-        /* Keep existing styles */
-        /* Add these styles */
-        .price-container {
-            text-align: center;
-            padding: 20px;
-            border: 1px solid #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            background: #f8f9fa;
+        .price-guide {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        .current-price {
-            font-size: 2.5rem;
-            font-weight: bold;
-            color: #28a745;
-            margin-bottom: 15px;
+        .price-guide th, 
+        .price-guide td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #ddd;
         }
-
-        .price-details {
-            color: #6c757d;
-            line-height: 1.5;
+        .price-guide th {
+            background-color: #43a047;
+            color: white;
+            font-weight: 500;
         }
-
-        .price-details p {
-            margin: 5px 0;
+        .price-guide tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
-
-        .external-content {
-            flex: 1;
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .price-guide tr:hover {
+            background-color: #f1f1f1;
         }
-
-        .external-content h2 {
-            color: #28a745;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-            text-align: center;
-        }
-
-        /* Style for the graph */
-        svg.plot-d6a7b5 {
-            max-width: 100%;
-            height: auto;
-            margin: 20px auto;
-            display: block;
-        }
-
-        /* Update the button container styles */
         .button-container {
             display: flex;
             justify-content: center;
-            gap: 20px;
-            margin: 30px auto;
-            text-align: center;
-            width: 100%;
+            gap: 1rem;
+            margin-top: 2rem;
         }
-
-        .view-button {
-            display: inline-block;
-            width: auto;
-            text-align: center;
-            background-color: #28a745;
+        .btn-submit {
+            background-color: #43a047;
             color: white;
-            text-decoration: none;
-            padding: 12px 25px;
+            padding: 0.8rem 1.5rem;
+            border: none;
             border-radius: 5px;
-            font-weight: bold;
-            margin: 0;
-            transition: background-color 0.3s, transform 0.2s;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
-
-        .view-button:hover {
-            background-color: #218838;
+        .btn-submit:hover {
+            background-color: #388e3c;
             transform: translateY(-2px);
+        }
+        .btn-back {
+            background-color: #666;
+            color: white;
+            padding: 0.8rem 1.5rem;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .btn-back:hover {
+            background-color: #555;
+            transform: translateY(-2px);
+            color: white;
         }
     </style>
 </head>
 <body>
-    <h2>Add Limau Kasturi Inventory</h2>
-    
-    <div class="content-container">
-        <!-- Form Section -->
-        <div class="form-section">
-            <form action="add_inventory.php" method="POST">
-                <label for="grade">Grade:</label>
-                <select name="grade" id="grade" required>
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                </select>
+    <div class="main-content">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="welcome-text">Add Inventory</h1>
+                <p class="subtitle">Add new items to your inventory</p>
+            </div>
 
-                <label for="quantity">Quantity (kg):</label>
-                <input type="number" name="quantity" id="quantity" required>
+            <div class="content-container">
+                <div class="form-section">
+                    <form method="POST">
+                        <div class="mb-3">
+                            <label for="grade">Grade:</label>
+                            <select name="grade" id="grade" required>
+                                <option value="">Select Grade</option>
+                                <option value="A">Grade A</option>
+                                <option value="B">Grade B</option>
+                                <option value="C">Grade C</option>
+                            </select>
+                        </div>
 
-                <label for="price_per_kg">Price per kg (RM):</label>
-                <input type="number" name="price_per_kg" id="price_per_kg" step="0.50" min="0.50" required>
+                        <div class="mb-3">
+                            <label for="quantity">Quantity (kg):</label>
+                            <input type="number" name="quantity" id="quantity" step="0.01" required>
+                        </div>
 
-                <button type="submit">Add Inventory</button>
-            </form>
-        </div>
+                        <div class="mb-3">
+                            <label for="price_per_kg">Price per kg (RM):</label>
+                            <input type="number" name="price_per_kg" id="price_per_kg" step="0.01" required>
+                        </div>
 
-        <!-- External Content Section -->
-        <div class="external-content">
-            <h2>Market Price Reference</h2>
-            <div class="price-container">
-                <h3 class="current-price">RM7.16</h3>
-                <div class="price-details">
-                    <p>Harga Purata 1kg LIMAU KASTURI</p>
-                    <p>Seluruh Negara untuk Minggu Ini<</p>
+                        <button type="submit" class="btn-submit w-100 mb-3">Add Inventory</button>
+                        <a href="index.php" class="btn-back d-block text-center">Back to Menu</a>
+                    </form>
+                </div>
+
+                <div class="form-section">
+                    <h2 class="text-center mb-4">Price Guide Reference</h2>
+                    <table class="price-guide">
+                        <thead>
+                            <tr>
+                                <th>Grade</th>
+                                <th>Price Range (RM/kg)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Grade A</td>
+                                <td>RM8.00 - RM10.00</td>
+                            </tr>
+                            <tr>
+                                <td>Grade B</td>
+                                <td>RM5.00 - RM7.00</td>
+                            </tr>
+                            <tr>
+                                <td>Grade C</td>
+                                <td>RM3.00 - RM4.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Centered buttons -->
-    <div class="button-container">
-        <a href="index.php" class="view-button">Go Back to Main Page</a>
-        <a href="view_inventory.php" class="view-button">Go to View Inventory</a>
-    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

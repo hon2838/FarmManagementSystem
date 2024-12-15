@@ -1,6 +1,6 @@
 <?php
 $host = "localhost";
-$username = "root";
+$username = "r1";
 $password = "";
 $database = "farm_management_system";
 

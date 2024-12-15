@@ -1,0 +1,60 @@
+Starting deletion for order ID: 32
+Order details fetched: Array
+(
+    [order_status] => Completed
+    [total_amount] => 6.00
+    [order_date] => 2024-12-16 00:02:19
+    [quantity] => 2
+    [grade] => B
+    [current_price] => 3.00
+    [delivery_address] => Jitra 13
+    [customer_name] => QI
+)
+
+Inventory update result: Success
+Rows affected: 1
+Formatted order ID for profits: ORD032
+Error occurred: Unknown database 'expenses_revenue'
+Starting deletion for order ID: 32
+Order details fetched: Array
+(
+    [order_status] => Completed
+    [total_amount] => 6.00
+    [order_date] => 2024-12-16 00:02:19
+    [quantity] => 2
+    [grade] => B
+    [current_price] => 3.00
+    [delivery_address] => Jitra 13
+    [customer_name] => QI
+)
+
+Inventory update result: Success
+Rows affected: 1
+Formatted order ID for profits: ORD032
+Error occurred: Unknown database 'expenses_revenue'
+Attempting to delete profit record for order: ORD034
+Rows affected: 0
+Attempting to delete profit record for order: ORD035
+Delete result: Success
+Rows affected: 0
+Attempting to delete profit record for order: ORD036
+Delete result: Success
+Rows affected: 0
+Attempting to delete profit record for order: ORD037
+Delete result: Success
+Rows affected: 0
+Attempting to delete profit record with order_id: ORD038
+Delete result: Success
+Rows affected: 0
+Attempting to delete profit record with order_id: ORD39
+Delete result: Success
+Rows affected: 0
+Attempting to delete profit record with order_id: ORD40
+Delete result: Success
+Rows affected: 0
+Attempting to delete profit record with order_id: ORD41
+Delete result: Success
+Rows affected: 0
+Attempting to delete profit record with order_id: ORD42
+Delete result: Success
+Rows affected: 1

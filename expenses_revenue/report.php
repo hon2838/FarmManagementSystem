@@ -107,7 +107,7 @@ $monthly_expenses = $conn->prepare("
             </div>
             <div class="card">
                 <div class="card-body">
-                    <h5 class="card-title">Net Income</h5>
+                    <h5 class="card-title"><?php echo $net_income >= 0 ? 'Net Income' : 'Net Loss'; ?></h5>
                     <p class="card-text <?php echo $net_income >= 0 ? 'text-success' : 'text-danger'; ?>">
                         <?php echo formatCurrency($net_income); ?>
                     </p>

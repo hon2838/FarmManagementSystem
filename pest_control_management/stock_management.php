@@ -1,5 +1,15 @@
 <?php
-include '../db.php';
+session_start();
+// Check if user is coming from main dashboard or has active session
+if (isset($_GET['user'])) {
+    $_SESSION['username'] = $_GET['user'];
+} elseif (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+require_once '../header.php';
+require_once '../db.php';
 
 // Get the latest stock item ID
 $latest_item = $pdo->query("
@@ -99,56 +109,65 @@ $stock_history = $pdo->query("
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Management</title>
+    <title>Stock Management - Pest Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: "Lato", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #e8f5e9; /* Light green background */
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+        .navbar {
+            background: rgba(33, 37, 41, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-1px);
+        }
+        .dropdown-menu {
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .dropdown-item {
+            color: rgba(255,255,255,0.85) !important;
+            transition: all 0.3s ease;
+        }
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff !important;
+            transform: translateX(5px);
+        }
+        .main-content {
+            padding: 4rem 0;
+        }
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
             color: #2e7d32;
+            margin-bottom: 1rem;
         }
-        header {
-            background-color: #66bb6a; /* Green header */
-            color: white;
-            padding: 1.5rem 0;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .form-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
-        header h1 {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 0;
-            text-shadow: 1px 1px 4px #a5d6a7;
-        }
-        main {
-            margin: 2rem auto;
-            max-width: 900px;
-            width: 90%;
+        .form-section {
+            flex: 1;
             background: white;
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
-            text-align: left;
-        }
-        main h2 {
-            color: #2e7d32;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .message {
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 5px;
-            background-color: #e8f5e9; /* Light green for success messages */
-            color: #4caf50; /* Green text */
-        }
-        .error {
-            background-color: #ffebee; /* Light red for error messages */
-            color: #f44336; /* Red text */
-        }
-        form {
-            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
         }
         form label {
             display: block;
@@ -156,7 +175,7 @@ $stock_history = $pdo->query("
             margin: 0.5rem 0;
             color: #2e7d32;
         }
-        form input, form select, form textarea {
+        form input, form select {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
@@ -166,189 +185,149 @@ $stock_history = $pdo->query("
             background-color: #f9f9f9;
         }
         form button {
-            background-color: #43a047; /* Button color */
+            background-color: #43a047;
             color: white;
             padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            transition: all 0.3s ease;
         }
         form button:hover {
-            background-color: #388e3c; /* Darker green */
-            transform: scale(1.05);
+            background-color: #388e3c;
+            transform: translateY(-2px);
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 2rem;
             background: white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border-radius: 10px;
+            overflow: hidden;
         }
         table th, table td {
-            border: 1px solid #c3e6cb;
-            padding: 0.8rem;
+            padding: 1rem;
             text-align: left;
+            border: 1px solid #e0e0e0;
         }
         table th {
-            background-color: #66bb6a; /* Header green */
+            background-color: #43a047;
             color: white;
-            font-weight: bold;
+            font-weight: 500;
         }
         table tr:nth-child(even) {
-            background-color: #f6fff2;
+            background-color: #f9f9f9;
         }
-        table tr:nth-child(odd) {
-            background-color: #ffffff;
-        }
-        table tr:hover {
-            background-color: #e8f5e9;
-        }
-        a.back-link {
-            display: inline-block;
-            margin-top: 2rem;
-            margin-right: 1rem;
-            text-decoration: none;
-            color: white;
-            background-color: #43a047; /* Button color */
-            padding: 0.8rem 1.5rem;
-            border-radius: 30px; /* Rounded corners */
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
-            text-align: center;
-        }
-        a.back-link:hover {
-            background-color: #388e3c; /* Darker green */
-            transform: translateY(-2px); /* Lift effect */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        a.back-link:active {
-            background-color: #2e7d32; /* Even darker green for active state */
-            transform: translateY(0); /* Reset lift effect */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        .form-container {
-            display: flex;
-            justify-content: space-between;
-            gap: 2rem;
-            margin-bottom: 2rem;
-        }
-
-        .form-section {
-            flex: 1;
-            background: white;
-            padding: 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
         .delete-btn {
             background-color: #dc3545;
             color: white;
             border: none;
-            padding: 5px 10px;
-            border-radius: 3px;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.3s;
+            transition: all 0.3s ease;
         }
-
         .delete-btn:hover {
             background-color: #c82333;
+            transform: translateY(-2px);
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Stock Management</h1>
-        <p>Keep track of your essential farming supplies.</p>
-    </header>
-    <main>
-        <?php if (isset($success)): ?>
-            <div class="message"><?php echo $success; ?></div>
-        <?php endif; ?>
-        
-        <?php if (isset($error)): ?>
-            <div class="message error"><?php echo $error; ?></div>
-        <?php endif; ?>
+    <div class="main-content">
+        <div class="container">
+            <header>
+                <h1>Stock Management</h1>
+                <p>Keep track of your essential farming supplies.</p>
+            </header>
+            <main>
+                <?php if (isset($success)): ?>
+                    <div class="message"><?php echo $success; ?></div>
+                <?php endif; ?>
+                
+                <?php if (isset($error)): ?>
+                    <div class="message error"><?php echo $error; ?></div>
+                <?php endif; ?>
 
-        <!-- Forms Container -->
-        <div class="form-container">
-            <!-- Register New Item Form -->
-            <div class="form-section">
-                <h2>Register New Item</h2>
-                <form method="POST">
-                    <label for="item_name">Item Name:</label>
-                    <input type="text" id="item_name" name="item_name" required>
-                    
-                    <label for="unit">Unit of Measurement:</label>
-                    <input type="text" id="unit" name="unit" placeholder="e.g., kg, L, pieces" required>
-                    
-                    <button type="submit" name="register_item">Register Item</button>
-                </form>
-            </div>
+                <!-- Forms Container -->
+                <div class="form-container">
+                    <!-- Register New Item Form -->
+                    <div class="form-section">
+                        <h2>Register New Item</h2>
+                        <form method="POST">
+                            <label for="item_name">Item Name:</label>
+                            <input type="text" id="item_name" name="item_name" required>
+                            
+                            <label for="unit">Unit of Measurement:</label>
+                            <input type="text" id="unit" name="unit" placeholder="e.g., kg, L, pieces" required>
+                            
+                            <button type="submit" name="register_item">Register Item</button>
+                        </form>
+                    </div>
 
-            <!-- Record Stock Form -->
-            <div class="form-section">
-                <h2>Record Stock</h2>
-                <form method="POST">
-                    <label for="item_id">Select Item:</label>
-                    <select name="item_id" id="item_id" required>
-                        <option value="">Select Item</option>
-                        <?php foreach ($stock as $item): ?>
-                            <option value="<?php echo $item['id']; ?>">
-                                <?php echo htmlspecialchars($item['item_name']) . ' (' . htmlspecialchars($item['unit']) . ')'; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
+                    <!-- Record Stock Form -->
+                    <div class="form-section">
+                        <h2>Record Stock</h2>
+                        <form method="POST">
+                            <label for="item_id">Select Item:</label>
+                            <select name="item_id" id="item_id" required>
+                                <option value="">Select Item</option>
+                                <?php foreach ($stock as $item): ?>
+                                    <option value="<?php echo $item['id']; ?>">
+                                        <?php echo htmlspecialchars($item['item_name']) . ' (' . htmlspecialchars($item['unit']) . ')'; ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
 
-                    <label for="quantity">Quantity:</label>
-                    <input type="number" id="quantity" name="quantity" required>
-                    
-                    <button type="submit" name="record_stock">Record Stock</button>
-                </form>
-            </div>
+                            <label for="quantity">Quantity:</label>
+                            <input type="number" id="quantity" name="quantity" required>
+                            
+                            <button type="submit" name="record_stock">Record Stock</button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Current Stock Table -->
+                <h2>Stock Record Log</h2>
+                <table>
+                    <tr>
+                        <th>Item Name</th>
+                        <th>Action</th>
+                        <th>Quantity</th>
+                        <th>Unit</th>
+                        <th>Date Updated</th>
+                        <th>Action</th>
+                    </tr>
+                    <?php 
+                    if (count($stock_history) > 0) {
+                        foreach ($stock_history as $record): 
+                        ?>
+                        <tr>
+                            <td><?= htmlspecialchars($record['item_name']) ?></td>
+                            <td><?= htmlspecialchars($record['action']) ?></td>
+                            <td><?= htmlspecialchars($record['quantity']) ?></td>
+                            <td><?= htmlspecialchars($record['unit']) ?></td>
+                            <td><?= date('Y-m-d', strtotime($record['last_updated'])) ?></td>
+                            <td>
+                                <button onclick="deleteRecord(<?= $record['id'] ?>)" class="delete-btn">Delete</button>
+                            </td>
+                        </tr>
+                        <?php 
+                        endforeach;
+                    } else {
+                        echo "<tr><td colspan='6' style='text-align: center;'>No stock records found.</td></tr>";
+                    }
+                    ?>
+                </table>
+                
+                <a href="index.php" class="back-link">Back to Pest Control Management</a>
+                <a href="view_stock.php" class="back-link">View Available Stock</a>
+            </main>
         </div>
-
-        <!-- Current Stock Table -->
-        <h2>Stock Record Log</h2>
-        <table>
-            <tr>
-                <th>Item Name</th>
-                <th>Action</th>
-                <th>Quantity</th>
-                <th>Unit</th>
-                <th>Date Updated</th>
-                <th>Action</th>
-            </tr>
-            <?php 
-            if (count($stock_history) > 0) {
-                foreach ($stock_history as $record): 
-                ?>
-                <tr>
-                    <td><?= htmlspecialchars($record['item_name']) ?></td>
-                    <td><?= htmlspecialchars($record['action']) ?></td>
-                    <td><?= htmlspecialchars($record['quantity']) ?></td>
-                    <td><?= htmlspecialchars($record['unit']) ?></td>
-                    <td><?= date('Y-m-d', strtotime($record['last_updated'])) ?></td>
-                    <td>
-                        <button onclick="deleteRecord(<?= $record['id'] ?>)" class="delete-btn">Delete</button>
-                    </td>
-                </tr>
-                <?php 
-                endforeach;
-            } else {
-                echo "<tr><td colspan='6' style='text-align: center;'>No stock records found.</td></tr>";
-            }
-            ?>
-        </table>
-        
-        <a href="index.php" class="back-link">Back to Pest Control Management</a>
-        <a href="view_stock.php" class="back-link">View Available Stock</a>
-    </main>
+    </div>
 
     <script>
     function deleteRecord(id) {
@@ -372,5 +351,6 @@ $stock_history = $pdo->query("
         }
     }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

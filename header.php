@@ -122,11 +122,11 @@ if (isset($_GET['logout'])) {
                         Farm Activities
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="../FarmActivities/index.php">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="../FarmActivities/schedule_activity.php">Schedule Activity</a></li>
-                        <li><a class="dropdown-item" href="../FarmActivities/activity_list.php">Activity List</a></li>
-                        <li><a class="dropdown-item" href="../FarmActivities/weather.php">Weather</a></li>
-                        <li><a class="dropdown-item" href="../FarmActivities/weather_prediction.php">Production Prediction</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/FarmActivities/index.php">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/FarmActivities/schedule_activity.php">Schedule Activity</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/FarmActivities/activity_list.php">Activity List</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/FarmActivities/weather.php">Weather</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/FarmActivities/weather_prediction.php">Production Prediction</a></li>
                     </ul>
                 </li>
                 <!-- Pest Control Dropdown -->
@@ -135,10 +135,10 @@ if (isset($_GET['logout'])) {
                         Pest Control
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="../pest_control_management/index.php">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="../pest_control_management/pesticide_schedule.php">Pesticide Schedule</a></li>
-                        <li><a class="dropdown-item" href="../pest_control_management/stock_management.php">Stock Management</a></li>
-                        <li><a class="dropdown-item" href="../pest_control_management/view_stock.php">View Stock</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/pest_control_management/index.php">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/pest_control_management/pesticide_schedule.php">Pesticide Schedule</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/pest_control_management/stock_management.php">Stock Management</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/pest_control_management/view_stock.php">View Stock</a></li>
                     </ul>
                 </li>
                 <!-- Inventory Dropdown -->
@@ -147,9 +147,9 @@ if (isset($_GET['logout'])) {
                         Inventory
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="../InventoryManagementSystem/index.php">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="../InventoryManagementSystem/add_inventory.php">Add Inventory</a></li>
-                        <li><a class="dropdown-item" href="../InventoryManagementSystem/view_inventory.php">View Inventory</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/InventoryManagementSystem/index.php">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/InventoryManagementSystem/add_inventory.php">Add Inventory</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/InventoryManagementSystem/view_inventory.php">View Inventory</a></li>
                     </ul>
                 </li>
                 <!-- Sales Dropdown -->
@@ -158,11 +158,11 @@ if (isset($_GET['logout'])) {
                         Sales
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="../limau_kasturi_orders/index.php">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="../limau_kasturi_orders/customer.php">Register Customer</a></li>
-                        <li><a class="dropdown-item" href="../limau_kasturi_orders/order_create_order.php">Create Order</a></li>
-                        <li><a class="dropdown-item" href="../limau_kasturi_orders/orders_update_status.php">Update Status</a></li>
-                        <li><a class="dropdown-item" href="../limau_kasturi_orders/completed_orders.php">Completed Orders</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/limau_kasturi_orders/index.php">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/limau_kasturi_orders/customer.php">Register Customer</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/limau_kasturi_orders/order_create_order.php">Create Order</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/limau_kasturi_orders/orders_update_status.php">Update Status</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/limau_kasturi_orders/completed_orders.php">Completed Orders</a></li>
                     </ul>
                 </li>
                 <!-- Finance Dropdown -->
@@ -171,10 +171,10 @@ if (isset($_GET['logout'])) {
                         Finance
                     </a>
                     <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="../expenses_revenue/dashboard.php">Dashboard</a></li>
-                        <li><a class="dropdown-item" href="../expenses_revenue/expenses.php">Expenses</a></li>
-                        <li><a class="dropdown-item" href="../expenses_revenue/profit.php">Profit</a></li>
-                        <li><a class="dropdown-item" href="../expenses_revenue/report.php">Report</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/expenses_revenue/dashboard.php">Dashboard</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/expenses_revenue/expenses.php">Expenses</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/expenses_revenue/revenue.php">Revenue</a></li>
+                        <li><a class="dropdown-item" href="/FarmManagementSystem/expenses_revenue/report.php">Report</a></li>
                     </ul>
                 </li>
                 <!-- User Dropdown -->

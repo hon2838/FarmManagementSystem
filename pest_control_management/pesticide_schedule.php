@@ -1,5 +1,15 @@
 <?php
-include '../db.php';
+session_start();
+// Check if user is coming from main dashboard or has active session
+if (isset($_GET['user'])) {
+    $_SESSION['username'] = $_GET['user'];
+} elseif (!isset($_SESSION['username'])) {
+    header("Location: ../index.php");
+    exit();
+}
+
+require_once '../header.php';
+require_once '../db.php';
 
 // Add a new pesticide schedule
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -31,7 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// Fetch existing schedules
+// Fetch existing schedules and available stock
 $schedules = $pdo->query("SELECT * FROM pesticide_schedule ORDER BY application_date DESC")->fetchAll(PDO::FETCH_ASSOC);
 $available_stock = $pdo->query("SELECT item_name, quantity FROM stock_management ORDER BY item_name ASC")->fetchAll(PDO::FETCH_ASSOC);
 ?>
@@ -41,197 +51,194 @@ $available_stock = $pdo->query("SELECT item_name, quantity FROM stock_management
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pesticide Scheduling</title>
+    <title>Pesticide Scheduling - Pest Control Management</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <style>
         body {
-            font-family: "Lato", sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #e8f5e9; /* Light green background */
+            min-height: 100vh;
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+        }
+        .navbar {
+            background: rgba(33, 37, 41, 0.95) !important;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .nav-link {
+            color: rgba(255,255,255,0.85) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: all 0.3s ease;
+        }
+        .nav-link:hover {
+            color: #fff !important;
+            transform: translateY(-1px);
+        }
+        .dropdown-menu {
+            background: rgba(33, 37, 41, 0.95);
+            backdrop-filter: blur(10px);
+            border: none;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .dropdown-item {
+            color: rgba(255,255,255,0.85) !important;
+            transition: all 0.3s ease;
+        }
+        .dropdown-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: #fff !important;
+            transform: translateX(5px);
+        }
+        .main-content {
+            padding: 4rem 0;
+        }
+        .welcome-text {
+            font-size: 2.5rem;
+            font-weight: 600;
             color: #2e7d32;
+            margin-bottom: 1rem;
         }
-        header {
-            background-color: #66bb6a; /* Green header */
-            color: white;
-            padding: 1.5rem 0;
-            text-align: center;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        header h1 {
-            font-size: 36px;
-            font-weight: bold;
-            margin: 0;
-            text-shadow: 1px 1px 4px #a5d6a7;
-        }
-        main {
-            margin: 2rem auto;
-            max-width: 900px;
-            width: 90%;
+        .form-container {
             background: white;
             padding: 2rem;
             border-radius: 10px;
-            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.1);
-            text-align: left;
-        }
-        main h2 {
-            color: #2e7d32;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .message {
-            padding: 1rem;
-            margin-bottom: 1rem;
-            border-radius: 5px;
-            background-color: #e8f5e9; /* Light green for success messages */
-            color: #4caf50; /* Green text */
-        }
-        .error {
-            background-color: #ffebee; /* Light red for error messages */
-            color: #f44336; /* Red text */
-        }
-        form {
-            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            margin-bottom: 2rem;
         }
         form label {
-            display: block;
-            font-size: 16px;
-            margin: 0.5rem 0;
             color: #2e7d32;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
         }
-        form input, form select, form textarea {
+        form select, form input, form textarea {
             width: 100%;
             padding: 0.8rem;
             margin-bottom: 1rem;
             border: 1px solid #c3e6cb;
             border-radius: 5px;
-            font-size: 16px;
             background-color: #f9f9f9;
         }
         form button {
-            background-color: #43a047; /* Button color */
+            background-color: #43a047;
             color: white;
             padding: 0.8rem 1.5rem;
             border: none;
             border-radius: 5px;
             font-size: 16px;
             cursor: pointer;
-            transition: background-color 0.3s, transform 0.2s;
+            width: 100%;
+            transition: all 0.3s ease;
         }
         form button:hover {
-            background-color: #388e3c; /* Darker green */
-            transform: scale(1.05);
+            background-color: #388e3c;
+            transform: translateY(-2px);
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 2rem;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
+            border-radius: 10px;
+            overflow: hidden;
         }
         table th, table td {
-            border: 1px solid #c3e6cb;
-            padding: 0.8rem;
+            padding: 1rem;
             text-align: left;
+            border: 1px solid #e0e0e0;
         }
         table th {
-            background-color: #66bb6a; /* Header green */
+            background-color: #43a047;
             color: white;
+            font-weight: 500;
         }
         table tr:nth-child(even) {
-            background-color: #f6fff2;
+            background-color: #f9f9f9;
         }
-        table tr:nth-child(odd) {
-            background-color: #ffffff;
+        .message {
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 5px;
+            background-color: #e8f5e9;
+            color: #2e7d32;
         }
-        a.back-link {
-            display: inline-block;
-            margin-top: 2rem;
-            margin-right: 1rem;
-            text-decoration: none;
-            color: white;
-            background-color: #43a047; /* Button color */
-            padding: 0.8rem 1.5rem;
-            border-radius: 30px; /* Rounded corners */
-            font-size: 16px;
-            font-weight: bold;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: background-color 0.3s, transform 0.2s, box-shadow 0.2s;
-            text-align: center;
-        }
-        a.back-link:hover {
-            background-color: #388e3c; /* Darker green */
-            transform: translateY(-2px); /* Lift effect */
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-        }
-        a.back-link:active {
-            background-color: #2e7d32; /* Even darker green for active state */
-            transform: translateY(0); /* Reset lift effect */
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        .message.error {
+            background-color: #ffebee;
+            color: #c62828;
         }
     </style>
 </head>
 <body>
-    <header>
-        <h1>Pesticide Scheduling</h1>
-    </header>
-    <main>
-        <h2>Schedule a Pesticide</h2>
-        <?php if (isset($message)): ?>
-            <div class="message <?= strpos($message, 'Error') !== false ? 'error' : '' ?>">
-                <?= htmlspecialchars($message) ?>
+    <div class="main-content">
+        <div class="container">
+            <div class="text-center mb-5">
+                <h1 class="welcome-text">Pesticide Scheduling</h1>
+                <p class="subtitle">Manage and track pesticide applications</p>
             </div>
-        <?php endif; ?>
-        <form method="POST">
-            <label>Pesticide Name:</label>
-            <select name="pesticide_name" required>
-                <?php foreach ($available_stock as $stock): ?>
-                    <option value="<?= htmlspecialchars($stock['item_name']) ?>"><?= htmlspecialchars($stock['item_name']) ?> (Available: <?= htmlspecialchars($stock['quantity']) ?>)</option>
+
+            <div class="form-container">
+                <?php if (isset($message)): ?>
+                    <div class="message <?= strpos($message, 'Error') !== false ? 'error' : '' ?>">
+                        <?= htmlspecialchars($message) ?>
+                    </div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <label>Pesticide Name:</label>
+                    <select name="pesticide_name" required>
+                        <?php foreach ($available_stock as $stock): ?>
+                            <option value="<?= htmlspecialchars($stock['item_name']) ?>"><?= htmlspecialchars($stock['item_name']) ?> (Available: <?= htmlspecialchars($stock['quantity']) ?>)</option>
+                        <?php endforeach; ?>
+                    </select>
+                    <label>Method:</label>
+                    <select name="method" required>
+                        <option value="chemical">Chemical</option>
+                        <option value="organic">Organic</option>
+                        <option value="biological">Biological</option>
+                    </select>
+                    <label>Application Date:</label>
+                    <input type="date" name="application_date" required>
+                    <label>Reapplication Interval (days):</label>
+                    <input type="number" name="reapplication_interval" required>
+                    <label>Quantity Used:</label>
+                    <input type="number" name="quantity_used" required>
+                    <label>Notes:</label>
+                    <textarea name="notes"></textarea>
+                    <button type="submit">Add Schedule</button>
+                </form>
+            </div>
+
+            <!-- Schedule Table -->
+            <table>
+                <tr>
+                    <th>Pesticide</th>
+                    <th>Method</th>
+                    <th>Application Date</th>
+                    <th>Reapplication Interval</th>
+                    <th>Next Application Date</th>
+                    <th>Quantity Used</th>
+                    <th>Notes</th>
+                    <th>Actions</th>
+                </tr>
+                <?php foreach ($schedules as $schedule): ?>
+                <tr>
+                    <td><?= htmlspecialchars($schedule['pesticide_name']) ?></td>
+                    <td><?= htmlspecialchars($schedule['method']) ?></td>
+                    <td><?= htmlspecialchars($schedule['application_date']) ?></td>
+                    <td><?= htmlspecialchars($schedule['reapplication_interval']) ?> days</td>
+                    <td><?= htmlspecialchars($schedule['next_application_date']) ?></td>
+                    <td><?= htmlspecialchars($schedule['quantity_used']) ?></td>
+                    <td><?= htmlspecialchars($schedule['notes']) ?></td>
+                    <td>
+                        <a href="pesticide_edit.php?id=<?= $schedule['id'] ?>">Edit</a> |
+                        <a href="pesticide_delete.php?id=<?= $schedule['id'] ?>" onclick="return confirm('Are you sure?')">Delete</a>
+                    </td>
+                </tr>
                 <?php endforeach; ?>
-            </select>
-            <label>Method:</label>
-            <select name="method" required>
-                <option value="chemical">Chemical</option>
-                <option value="organic">Organic</option>
-                <option value="biological">Biological</option>
-            </select>
-            <label>Application Date:</label>
-            <input type="date" name="application_date" required>
-            <label>Reapplication Interval (days):</label>
-            <input type="number" name="reapplication_interval" required>
-            <label>Quantity Used:</label>
-            <input type="number" name="quantity_used" required>
-            <label>Notes:</label>
-            <textarea name="notes"></textarea>
-            <button type="submit">Add Schedule</button>
-        </form>
-        <h2>Existing Schedules</h2>
-        <table>
-            <tr>
-                <th>Pesticide</th>
-                <th>Method</th>
-                <th>Application Date</th>
-                <th>Reapplication Interval</th>
-                <th>Next Application Date</th>
-                <th>Quantity Used</th>
-                <th>Notes</th>
-                <th>Actions</th>
-            </tr>
-            <?php foreach ($schedules as $schedule): ?>
-            <tr>
-                <td><?= htmlspecialchars($schedule['pesticide_name']) ?></td>
-                <td><?= htmlspecialchars($schedule['method']) ?></td>
-                <td><?= htmlspecialchars($schedule['application_date']) ?></td>
-                <td><?= htmlspecialchars($schedule['reapplication_interval']) ?> days</td>
-                <td><?= htmlspecialchars($schedule['next_application_date']) ?></td>
-                <td><?= htmlspecialchars($schedule['quantity_used']) ?></td>
-                <td><?= htmlspecialchars($schedule['notes']) ?></td>
-                <td>
-                    <a href="pesticide_edit.php?id=<?= $schedule['id'] ?>">Edit</a> |
-                    <a href="pesticide_delete.php?id=<?= $schedule['id'] ?>" onclick="return confirm('Are you sure?')">Delete</a>
-                </td>
-            </tr>
-            <?php endforeach; ?>
-        </table>
-        <a href="index.php" class="back-link">Back to Pest Control Management</a>
-        <a href="stock_management.php" class="back-link">Go to Stock Management</a>
-    </main>
+            </table>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

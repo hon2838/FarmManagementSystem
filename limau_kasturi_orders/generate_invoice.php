@@ -8,7 +8,7 @@ if (isset($_GET['order_id'])) {
     // Fetch order and customer details
     $sql = "SELECT orders.order_id, orders.total_amount, orders.payment_method, orders.order_status,
                    customers.customer_name, customers.customer_phone, customers.delivery_address,
-                   order_items.quantity, order_items.current_price, orders.order_date
+                   order_items.quantity, order_items.current_price, order_items.grade, orders.order_date
             FROM orders
             JOIN customers ON orders.customer_id = customers.customer_id
             JOIN order_items ON orders.order_id = order_items.order_id
@@ -169,6 +169,7 @@ if (isset($_GET['order_id'])) {
             <thead>
                 <tr>
                     <th>Description</th>
+                    <th>Grade</th>  <!-- Add grade column -->
                     <th>Quantity</th>
                     <th>Unit Price (RM)</th>
                     <th>Amount (RM)</th>
@@ -177,6 +178,7 @@ if (isset($_GET['order_id'])) {
             <tbody>
                 <tr>
                     <td>Limau Kasturi</td>
+                    <td><?php echo $order['grade']; ?></td>  <!-- Add grade -->
                     <td><?php echo $order['quantity']; ?> kg</td>
                     <td><?php echo number_format($order['current_price'], 2); ?></td>
                     <td><?php echo number_format($order['total_amount'], 2); ?></td>
